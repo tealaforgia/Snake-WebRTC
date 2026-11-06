@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <filter id="neon-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur1" />
+      <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur2" />
+      <feGaussianBlur in="SourceGraphic" stdDeviation="22" result="blur3" />
+      <feMerge>
+        <feMergeNode in="blur3" />
+        <feMergeNode in="blur2" />
+        <feMergeNode in="blur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <pattern id="scanlines" patternUnits="userSpaceOnUse" width="10" height="10">
+      <rect width="10" height="4" fill="#000000" opacity="0.25" />
+    </pattern>
+  </defs>
+  <rect width="400" height="400" rx="150" fill="#050a05" />
+  <g filter="url(#neon-glow)">
+    <rect x="90" y="250" width="60" height="60" fill="#00ff44" />
+    <rect x="170" y="250" width="60" height="60" fill="#00ff44" />
+    <rect x="250" y="250" width="60" height="60" fill="#00ff44" />
+    <rect x="250" y="170" width="60" height="60" fill="#e0ffe5" />
+    <rect x="250" y="110" width="60" height="20" fill="#00ff44" />
+    <rect x="270" y="90" width="20" height="60" fill="#00ff44" />
+  </g>
+  <rect width="400" height="400" rx="150" fill="url(#scanlines)" pointer-events="none" />
+</svg>
