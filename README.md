@@ -2,7 +2,7 @@
 
 <img src="images/icon.svg" alt="Icona del progetto" width="128" height="128">
 
-Retro Snake game with 1P/2P modes, WebRTC LAN multiplayer, WebGPU HDR rendering. A modern, hyper-portable take on the classic retro game.
+Retro Snake game with 1P/2P modes, WebRTC P2P LAN multiplayer, WebGPU HDR rendering. A modern, hyper-portable take on the classic retro game.
 
 **Play it live:** [laforgia.xyz/snake.html](https://www.laforgia.xyz/snake.html)
 
@@ -29,9 +29,9 @@ The best part? **It's completely serverless.** Everything — gameplay, renderin
 * **Responsive & Mobile-Ready:** Flawlessly adapts to any screen size. Features specific CSS optimizations for mobile browsers, including safe-area insets and touch-action handling.
 * **Multiple Input Methods:** Fully playable via physical keyboard (WASD/Arrows), an on-screen touch D-pad, or swipe gestures for mobile devices. Each player can map their preferred input independently.
 * **Customizable Themes:** Switch between different retro color palettes (Green, Amber, White, Cyan, Purple, Red) on the fly.
-* **Procedural Web Audio:** Custom sound effects are synthesized dynamically in real-time using the Web Audio API.
+* **Procedural Web Audio:** Sound effects are synthesized dynamically in real-time using the Web Audio API.
 * **Gameplay Modifiers:** 
-  * **Dynamic Difficulty:** Optional acceleration mode that dynamically reduces tick time as you consume more food.
+  * **Dynamic Difficulty:** Optional acceleration mode that reduces tick time as you consume more food.
   * **Wall Wrapping:** Play with solid borders or wrap-around borders.
   * **Pacing Control:** Choose between 9 different base speed levels.
 * **Bonus Mechanics:** Keep an eye out for a time-limited bonus target that spawns every 5 items consumed to boost your score.
