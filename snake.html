@@ -901,6 +901,7 @@ html.is-iframe .hint {
           <button class="tg opt" id="lH" data-i18n="lan_create">[ ] host game</button>
           <button class="tg opt" id="lJ" data-i18n="lan_join">[ ] join</button>
           <button class="tg hide" id="lX" data-i18n="lan_close">[x] close</button>
+          <button class="tg hide" id="lW" role="switch" data-i18n="keep_off">[ ] reduce WiFi lag</button>
         </div>
         <span class="note" id="lanSt" data-i18n="lan_st_webrtc">WebRTC LAN play</span>
       </div>
@@ -1013,6 +1014,8 @@ const i18n = {
     lan_create: "[ ] host game",
     lan_join: "[ ] join",
     lan_close: "[x] close",
+    keep_on: "[x] reduce WiFi lag",
+    keep_off: "[ ] reduce WiFi lag",
     lan_st_webrtc: "WebRTC LAN play",
     code: "$ code",
     ph_your_code: "your code",
@@ -1177,6 +1180,8 @@ const i18n = {
     lan_create: "[ ] crea partita",
     lan_join: "[ ] unisciti",
     lan_close: "[x] chiudi",
+    keep_on: "[x] riduci lag WiFi",
+    keep_off: "[ ] riduci lag WiFi",
     lan_st_webrtc: "WebRTC LAN play",
     code: "$ codice",
     ph_your_code: "il tuo codice",
@@ -2704,6 +2709,9 @@ $('bDl').onclick = () => Object.assign(document.createElement('a'), { href: 'sna
 const NET_GATHER_MS = 5000;
 const NET_PAIR_MS = 300000;
 const NET_LINK_MS = 20000;
+const NET_KEEP_MS = 30;
+const NET_KEEP_BYTES = 8;
+const NET_SILENCE_S = 10;
 
 const net = {
   on: false,
@@ -2723,7 +2731,10 @@ const net = {
   pm: 1,
   pi: 0,
   to: 0,
-  rd: false
+  rd: false,
+  kp: false,
+  kt: 0,
+  au: null
 };
 
 const isCli = () => net.on && net.role === 'client';
@@ -2994,6 +3005,8 @@ function onCtl(e) {
   } else if (m.t === 'q') {
     net.rtt = Math.round(performance.now() - m.n);
     netUI();
+  } else if (m.t === 'lw') {
+    netKeep(!!m.on);
   } else if (m.t === 'req' && net.role === 'host') {
     if (m.a === 'pause') {
       if (state === 'run') pause();
@@ -3055,10 +3068,73 @@ function sendIn() {
   f.send(a);
 }
 
+function sendKeep() {
+  const f = net.fast;
+  if (!f || f.readyState !== 'open' || f.bufferedAmount > 256) return;
+
+  const a = new Uint8Array(NET_KEEP_BYTES);
+  a[0] = 3;
+  f.send(a);
+}
+
+function netKeep(on, local) {
+  net.kp = on;
+  clearInterval(net.kt);
+  net.kt = on ? setInterval(sendKeep, NET_KEEP_MS) : 0;
+  netUI();
+  if (local) netCtl({ t: 'lw', on: +on });
+}
+
+function silentUrl() {
+  const rate = 8000;
+  const n = rate * NET_SILENCE_S;
+  const dv = new DataView(new ArrayBuffer(44 + n * 2));
+
+  const str = (o, s) => {
+    for (let i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i));
+  };
+
+  str(0, 'RIFF');
+  dv.setUint32(4, 36 + n * 2, true);
+  str(8, 'WAVEfmt ');
+  dv.setUint32(16, 16, true);
+  dv.setUint16(20, 1, true);
+  dv.setUint16(22, 1, true);
+  dv.setUint32(24, rate, true);
+  dv.setUint32(28, rate * 2, true);
+  dv.setUint16(32, 2, true);
+  dv.setUint16(34, 16, true);
+  str(36, 'data');
+  dv.setUint32(40, n * 2, true);
+
+  return URL.createObjectURL(new Blob([dv.buffer], { type: 'audio/wav' }));
+}
+
+function netAudio(on) {
+  const ms = navigator.mediaSession;
+
+  if (!on) {
+    if (net.au) net.au.pause();
+    if (ms) ms.metadata = null;
+    return;
+  }
+
+  if (!net.au) {
+    // digital silence at full volume: muted media may not keep the tab alive
+    net.au = new Audio(silentUrl());
+    net.au.loop = true;
+  }
+
+  net.au.play().catch(() => {});
+  if (ms) ms.metadata = new MediaMetadata({ title: 'Snake-WebRTC' });
+}
+
 function netUI() {
   if (net.on) {
     const roleHtml = net.role === 'host' ? t('host_p1') : t('guest_p2');
     lanSt(roleHtml + t('lan_connected') + (net.rtt == null ? '…' : net.rtt + ' ms'));
+    $('lW').innerHTML = net.kp ? t('keep_on') : t('keep_off');
+    $('lW').setAttribute('aria-checked', net.kp);
   }
 }
 
@@ -3066,6 +3142,7 @@ function netUp() {
   clearTimeout(net.to);
   net.on = true;
   sfx.conn();
+  netAudio(true);
   net.pm = cfg.mode;
   cfg.mode = 2;
   net.lg = null;
@@ -3078,6 +3155,7 @@ function netUp() {
   set('idle');
   reset();
   $('lanP').classList.add('hide');
+  $('lW').classList.remove('hide');
   net.pi = setInterval(() => netCtl({ t: 'p', n: performance.now() }), 1000);
   netUI();
   netState();
@@ -3095,6 +3173,8 @@ function netWatch(ms, why) {
 function netDown(why) {
   if (!net.pc) return;
   clearInterval(net.pi);
+  clearInterval(net.kt);
+  netAudio(false);
   clearTimeout(net.to);
   const was = net.on;
   const pc = net.pc;
@@ -3102,6 +3182,7 @@ function netDown(why) {
   net.on = false;
   net.role = null;
   net.rd = false;
+  net.kp = false;
 
   try {
     pc.close();
@@ -3118,6 +3199,7 @@ function netDown(why) {
 
   $('lanP').classList.add('hide');
   $('lX').classList.add('hide');
+  $('lW').classList.add('hide');
   $('lH').classList.remove('hide');
   $('lJ').classList.remove('hide');
   lanSt(why || t('lan_disconnected'));
@@ -3194,6 +3276,7 @@ async function netStart(role) {
 $('lH').onclick = () => netStart('host');
 $('lJ').onclick = () => netStart('client');
 $('lX').onclick = () => netDown(t('lan_closed'));
+$('lW').onclick = () => netKeep(!net.kp, true);
 
 $('lCp').onclick = async () => {
   const txt = $('lOut').value;
