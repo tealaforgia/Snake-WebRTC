@@ -8,7 +8,7 @@ Retro Snake game with 1P/2P modes, WebRTC LAN multiplayer, WebGPU HDR rendering.
 
 ## About the Project
 
-What originally started as a hidden easter egg for my personal website quickly evolved into a much more ambitious project. Developed with the assistance of LLMs, this game brings the nostalgic Snake experience into the modern web era using cutting-edge browser APIs. 
+What originally started as a hidden easter egg for my personal website quickly evolved into a much more ambitious project. Built utilizing LLM-assisted code generation, this game brings the nostalgic Snake experience into the modern web era using cutting-edge browser APIs. 
 
 The best part? **It's completely serverless.** Everything — gameplay, rendering, and even LAN multiplayer — is packed into a single, standalone HTML file. 
 
