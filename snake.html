@@ -1,0 +1,3162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Snake-WebRTC</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNDAwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIj4KICA8ZGVmcz4KICAgIDxmaWx0ZXIgaWQ9Im5lb24tZ2xvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+CiAgICAgIDxmZUdhdXNzaWFuQmx1ciBpbj0iU291cmNlR3JhcGhpYyIgc3RkRGV2aWF0aW9uPSI1IiByZXN1bHQ9ImJsdXIxIiAvPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgaW49IlNvdXJjZUdyYXBoaWMiIHN0ZERldmlhdGlvbj0iMTIiIHJlc3VsdD0iYmx1cjIiIC8+CiAgICAgIDxmZUdhdXNzaWFuQmx1ciBpbj0iU291cmNlR3JhcGhpYyIgc3RkRGV2aWF0aW9uPSIyMiIgcmVzdWx0PSJibHVyMyIgLz4KICAgICAgPGZlTWVyZ2U+CiAgICAgICAgPGZlTWVyZ2VOb2RlIGluPSJibHVyMyIgLz4KICAgICAgICA8ZmVNZXJnZU5vZGUgaW49ImJsdXIyIiAvPgogICAgICAgIDxmZU1lcmdlTm9kZSBpbj0iYmx1cjEiIC8+CiAgICAgICAgPGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIiAvPgogICAgICA8L2ZlTWVyZ2U+CiAgICA8L2ZpbHRlcj4KICAgIDxwYXR0ZXJuIGlkPSJzY2FubGluZXMiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+CiAgICAgIDxyZWN0IHdpZHRoPSIxMCIgaGVpZ2h0PSI0IiBmaWxsPSIjMDAwMDAwIiBvcGFjaXR5PSIwLjI1IiAvPgogICAgPC9wYXR0ZXJuPgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgcng9IjE1MCIgZmlsbD0iIzA1MGEwNSIgLz4KICA8ZyBmaWx0ZXI9InVybCgjbmVvbi1nbG93KSI+CiAgICA8cmVjdCB4PSI5MCIgeT0iMjUwIiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiMwMGZmNDQiIC8+CiAgICA8cmVjdCB4PSIxNzAiIHk9IjI1MCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjMDBmZjQ0IiAvPgogICAgPHJlY3QgeD0iMjUwIiB5PSIyNTAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgZmlsbD0iIzAwZmY0NCIgLz4KICAgIDxyZWN0IHg9IjI1MCIgeT0iMTcwIiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIGZpbGw9IiNlMGZmZTUiIC8+CiAgICA8cmVjdCB4PSIyNTAiIHk9IjExMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjMDBmZjQ0IiAvPgogICAgPHJlY3QgeD0iMjcwIiB5PSI5MCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjMDBmZjQ0IiAvPgogIDwvZz4KICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgcng9IjE1MCIgZmlsbD0idXJsKCNzY2FubGluZXMpIiBwb2ludGVyLWV2ZW50cz0ibm9uZSIgLz4KPC9zdmc+Cg==">
+  <meta name="description" content="Retro Snake game with 1P/2P modes, WebRTC LAN multiplayer, WebGPU HDR rendering.">
+  <meta property="og:title" content="Snake">
+  <meta property="og:description" content="Retro Snake game with 1P/2P modes, WebRTC LAN multiplayer, WebGPU HDR rendering.">
+  <meta property="og:type" content="website">
+  <style id="css">
+@font-face {
+  font-family: 'VT323';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  /*
+   * Font: VT323
+   * Copyright 2011, The VT323 Project Authors (peter.hull@oikoi.com)
+   * Licensed under the SIL Open Font License, Version 1.1.
+   * http://scripts.sil.org/OFL
+   */
+  src: url('data:font/woff2;charset=utf-8;base64,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') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+html.is-iframe,
+html.is-iframe body {
+  scrollbar-width: none;
+}
+
+html.is-iframe::-webkit-scrollbar,
+html.is-iframe body::-webkit-scrollbar {
+  display: none;
+}
+
+:root {
+  --bg: #020402;
+  --fg: #3dff7a;
+  --dim: #1f8a44;
+  --faint: #0e3a1d;
+  --amb: #ffb000;
+  --red: #ff5050;
+  --bd: #14532d;
+  --cbg: #000000;
+  --dot: rgba(61, 255, 122, .12);
+  --wall-on: #2fd366;
+  --wall-off: #1b6b37;
+  --head: #c8ffd8;
+  --food: #3dff7a;
+  --glow: rgba(61, 255, 122, .45);
+  --glow2: rgba(61, 255, 122, .14);
+  --bloom: .5;
+  color-scheme: dark;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+  background: var(--bg);
+  -webkit-tap-highlight-color: transparent;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  color: var(--fg);
+  font: 20px/1.25 "VT323", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+  text-shadow: 0 0 calc(6px * var(--bloom)) var(--glow);
+  letter-spacing: 0.03em;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#app {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.term {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  min-width: 0;
+  border: 2px solid var(--bd);
+  border-radius: 12px;
+  background: var(--cbg);
+  box-shadow:
+    0 0 calc(40px * var(--bloom)) var(--glow2),
+    0 20px 60px rgba(0, 0, 0, .9),
+    inset 0 0 20px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+
+.term::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .2) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, .6)),
+    url('data:image/svg+xml;utf8,<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"><filter id="n1"><feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n1)" opacity="0.03"/></svg>');
+  background-size: auto, auto, 128px 128px;
+  background-repeat: repeat, no-repeat, repeat;
+}
+
+.fx {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.fx::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(color-mix(in srgb, var(--fg) 8%, transparent) 1px, transparent 1.4px);
+  background-size: 26px 26px;
+  animation: fxdrift 80s linear infinite;
+}
+
+@keyframes fxdrift {
+  to {
+    background-position: 260px 130px;
+  }
+}
+
+.fx::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(700px 480px at 50% 34%, color-mix(in srgb, var(--fg) 6%, transparent), transparent 70%),
+    radial-gradient(520px 400px at 88% 92%, color-mix(in srgb, var(--amb) 4%, transparent), transparent 70%),
+    url('data:image/svg+xml;utf8,<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"><filter id="n2"><feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n2)" opacity="0.03"/></svg>');
+  background-size: auto, auto, 128px 128px;
+  background-repeat: no-repeat, no-repeat, repeat;
+}
+
+.fx i {
+  position: absolute;
+  border-radius: 1px;
+  background: var(--fg);
+  opacity: .13;
+  animation: fxfloat ease-in-out infinite;
+}
+
+@keyframes fxfloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-60px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx::before,
+  .fx i {
+    animation: none;
+  }
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--bd);
+  background: color-mix(in srgb, var(--faint) 50%, transparent);
+  color: var(--dim);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bar i {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, .35);
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.bar i:hover {
+  filter: brightness(1.25) saturate(1.2);
+  transform: scale(1.1);
+}
+
+.bar i.btn-r {
+  background: #ff4338;
+  border: 1px solid rgba(0, 0, 0, .12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bar i.btn-y {
+  background: #ffb81a;
+  border: 1px solid rgba(0, 0, 0, .12);
+}
+
+.bar i.btn-g {
+  background: #14d43c;
+  border: 1px solid rgba(0, 0, 0, .12);
+}
+
+@supports (color: color(display-p3 1 0 0)) {
+  .bar i.btn-r {
+    background: color(display-p3 1 .26 .22);
+  }
+  .bar i.btn-y {
+    background: color(display-p3 1 .74 .08);
+  }
+  .bar i.btn-g {
+    background: color(display-p3 .14 .86 .27);
+  }
+}
+
+html.is-iframe .bar i.btn-r::after {
+  content: "";
+  display: block;
+  width: 12px;
+  height: 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231c0101' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M18 6L6 18M6 6l12 12'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.bar span {
+  margin-left: 8px;
+}
+
+.am {
+  color: var(--amb);
+  text-shadow: 0 0 calc(6px * var(--bloom)) color-mix(in oklab, var(--amb) 60%, transparent);
+}
+
+.cur {
+  animation: bl 1s steps(1) infinite;
+}
+
+.cur2 {
+  margin-left: 2px;
+}
+
+@keyframes bl {
+  50% {
+    opacity: 0;
+  }
+}
+
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 18px;
+  padding: 10px 14px;
+}
+
+.hud-group {
+  display: flex;
+  gap: 0 18px;
+  white-space: nowrap;
+}
+
+.hud b {
+  font-weight: 400;
+  color: var(--head);
+  text-shadow: 0 0 calc(8px * var(--bloom)) var(--glow2);
+}
+
+#bn {
+  flex-basis: 100%;
+  min-height: 1.25em;
+  color: var(--amb);
+  text-shadow: 0 0 calc(6px * var(--bloom)) color-mix(in oklab, var(--amb) 50%, transparent);
+}
+
+.screen {
+  position: relative;
+  margin: 0 12px;
+  border: 2px solid var(--bd);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--cbg) 98%, var(--head));
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  touch-action: none;
+  line-height: 0;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 calc(2px * var(--bloom)) var(--glow2));
+}
+
+#cg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+canvas.hdr-src {
+  visibility: hidden;
+}
+
+.ovl {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 2;
+}
+
+.hide {
+  display: none !important;
+}
+
+.ctl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 12px;
+}
+
+.pad {
+  display: grid;
+  grid-template-columns: repeat(3, 56px);
+  grid-template-rows: repeat(2, 52px);
+  grid-template-areas:
+    ". u ."
+    "l d r";
+  gap: 6px;
+}
+
+.act {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 170px;
+  max-width: 300px;
+}
+
+button {
+  font: inherit;
+  color: var(--fg);
+  text-shadow: inherit;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--dim);
+  border-radius: 6px;
+  padding: 4px 10px;
+  min-height: 40px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--faint) 80%, transparent);
+  box-shadow: 0 4px calc(12px * var(--bloom)) var(--glow2);
+  transform: translateY(-1px);
+  color: var(--head);
+}
+
+button:active:not(:disabled) {
+  background: var(--fg);
+  color: var(--bg);
+  text-shadow: none;
+  transform: scale(0.96) translateY(2px);
+  box-shadow: none;
+}
+
+button:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+  background: transparent;
+  color: var(--dim);
+  transform: none;
+  box-shadow: none;
+}
+
+.pad button {
+  font-size: 24px;
+  padding: 0;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--cbg) 40%, transparent);
+  border-bottom: 3px solid var(--dim);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.pad button:active {
+  border-bottom-width: 1px;
+  transform: translateY(3px) scale(0.96);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.opts {
+  padding: 0 12px 12px;
+  background: color-mix(in srgb, var(--cbg) 50%, transparent);
+  border-radius: 0 0 12px 12px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 20px 0;
+}
+
+.row > b {
+  font-weight: 400;
+  min-width: 11ch;
+  color: var(--dim);
+}
+
+#lv {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+#lv button,
+.iBtn {
+  min-width: 34px;
+  min-height: 36px;
+  padding: 0 8px;
+}
+
+#lv button[aria-pressed=true],
+#pal button[aria-pressed=true],
+#hdrSel button[aria-pressed=true],
+.iBtn[aria-pressed=true] {
+  background: var(--fg);
+  color: var(--bg);
+  text-shadow: none;
+  transform: scale(1.05);
+  box-shadow: 0 0 calc(12px * var(--bloom)) var(--glow);
+}
+
+#pal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+#pal button,
+#hdrSel button {
+  min-width: 34px;
+  min-height: 36px;
+  padding: 0 8px;
+}
+
+#hdrSel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tg {
+  border-color: transparent;
+  padding: 4px 6px 4px 0;
+  text-align: left;
+  background: transparent;
+  box-shadow: none;
+}
+
+.tg:hover:not(:disabled) {
+  background: transparent;
+  color: var(--head);
+  box-shadow: none;
+  transform: translateX(2px);
+}
+
+.tg:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.note {
+  flex-basis: 100%;
+  margin-top: 0px;
+  color: var(--dim);
+  font-size: 17px;
+  opacity: 0.8;
+}
+
+.dash {
+  color: var(--dim);
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  letter-spacing: 4px;
+  opacity: 0.4;
+  margin: 4px 0 -8px;
+  width: 100%;
+}
+
+.hint {
+  padding: 8px 12px 16px;
+  color: var(--dim);
+  font-size: 17px;
+  text-align: center;
+  background: color-mix(in srgb, var(--cbg) 50%, transparent);
+  border-radius: 0 0 12px 12px;
+  margin-top: 0;
+}
+
+.codec {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(8px, 2vw, 16px);
+  padding: clamp(12px, 3vw, 24px);
+  background: color-mix(in srgb, var(--fg) 8%, #000);
+  font-size: clamp(14px, 3.5vw, 24px);
+  line-height: 1.15;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(3px);
+}
+
+.codec.hide {
+  display: none !important;
+}
+
+.cf {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: clamp(6px, 1.5vw, 12px);
+  margin-top: clamp(10px, 2.5vw, 20px);
+}
+
+.cp {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: justify;
+}
+
+.cp pre {
+  margin: 0 0 clamp(4px, 1vw, 8px);
+  font: inherit;
+  font-size: clamp(11px, 2.8vw, 20px);
+  line-height: 1;
+  color: var(--head);
+  text-shadow: 0 0 calc(4px * var(--bloom)) var(--glow2);
+}
+
+.cp b {
+  font-weight: 400;
+  color: var(--dim);
+  background: var(--cbg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--bd);
+}
+
+.cm {
+  flex: 0 0 auto;
+  text-align: center;
+  font-size: 1.6em;
+  color: #c8ffd8;
+  text-shadow: 0 0 calc(8px * var(--bloom)) var(--glow);
+}
+
+.cm small {
+  display: block;
+  font-size: .55em;
+  color: var(--dim);
+  text-shadow: none;
+  margin-top: 2px;
+}
+
+.ct {
+  min-height: 4.8em;
+  background: rgba(0, 0, 0, 0.6);
+  padding: clamp(10px, 2.5vw, 20px);
+  border-radius: 6px;
+  border: 1px solid var(--bd);
+  overflow-y: auto;
+}
+
+.ct b {
+  font-weight: 400;
+}
+
+.ct .s {
+  color: var(--amb);
+}
+
+.ct .c {
+  color: #8fd3ff;
+}
+
+.cx {
+  text-align: center;
+  color: var(--dim);
+  font-size: .85em;
+  animation: bl 2s steps(1) infinite;
+}
+
+textarea {
+  font: inherit;
+  font-size: 16px;
+  color: var(--fg);
+  background: var(--cbg);
+  border: 1px solid var(--dim);
+  border-radius: 6px;
+  padding: 6px;
+  width: 100%;
+  resize: vertical;
+  word-break: break-all;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+#lanP > div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+@media (dynamic-range: high) {
+  .hud b {
+    text-shadow:
+      0 0 calc(10px * var(--bloom)) var(--glow),
+      0 0 calc(20px * var(--bloom)) color-mix(in oklab, var(--head) 60%, transparent);
+  }
+}
+
+html.is-iframe {
+  height: 100%;
+  background: var(--cbg) !important;
+}
+
+html.is-iframe body {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+html.is-iframe #app {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+html.is-iframe .fx {
+  display: none !important;
+}
+
+html.is-iframe .term {
+  max-width: 100% !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+html.is-iframe .hint {
+  flex-grow: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 4px;
+    font-size: 18px;
+  }
+
+  .term {
+    border-radius: 8px;
+  }
+
+  .bar {
+    padding: 6px 8px;
+  }
+
+  .hud {
+    padding: 6px 10px;
+    gap: 0 10px;
+  }
+
+  .screen {
+    margin: 0 8px;
+    border-width: 1px;
+  }
+
+  .ctl {
+    padding: 12px 8px;
+    gap: 14px;
+    justify-content: center;
+  }
+
+  .act {
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .act button {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .pad {
+    grid-template-columns: repeat(3, 50px);
+    grid-template-rows: repeat(2, 46px);
+    gap: 4px;
+  }
+
+  .opts {
+    padding: 0 8px 8px;
+  }
+
+  .row {
+    gap: 6px;
+    margin: 16px 0;
+  }
+
+  .codec {
+    padding: 6px 8px;
+    gap: 4px;
+  }
+
+  .cf {
+    margin-top: 0;
+  }
+
+  .cp pre {
+    font-size: clamp(8px, 2.2vw, 12px);
+    margin-bottom: 2px;
+  }
+
+  .cm {
+    font-size: 1.3em;
+  }
+
+  .ct {
+    padding: 6px 8px;
+    min-height: 4em;
+    max-height: 6em;
+  }
+
+  .cx {
+    font-size: 13px;
+    margin-top: 2px;
+  }
+
+  .hint {
+    padding: 8px 8px 12px;
+    font-size: 15px;
+  }
+}
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="fx" aria-hidden="true">
+    <i style="left:7%;top:26%;width:6px;height:6px;animation-duration:11s"></i>
+    <i style="left:14%;top:70%;width:5px;height:5px;animation-duration:14s;animation-delay:-4s"></i>
+    <i style="left:86%;top:32%;width:7px;height:7px;animation-duration:12s;animation-delay:-2s"></i>
+    <i style="left:92%;top:64%;width:5px;height:5px;animation-duration:16s;animation-delay:-7s"></i>
+    <i style="left:48%;top:88%;width:6px;height:6px;animation-duration:13s;animation-delay:-5s"></i>
+  </div>
+
+  <div class="term">
+    <div class="bar">
+      <i class="btn-r"></i>
+      <i class="btn-y"></i>
+      <i class="btn-g"></i>
+      <span id="tt">
+        <span class="am">tealaforgia@retro</span><span style="color:var(--dim)">:~$</span>
+        <span style="color:var(--head)">./snake --webrtc</span><span class="cur">█</span>
+      </span>
+    </div>
+
+    <div class="hud">
+      <div class="hud-group">
+        <span id="sc0c"><span data-i18n="score">score</span> <b id="sc">0000</b></span>
+        <span id="sc1c" class="hide" style="color:var(--head)"><span data-i18n="p1">P1</span> <b id="sc1">0000</b></span>
+        <span id="sc2c" class="hide" style="color:var(--red)"><span data-i18n="p2">P2</span> <b id="sc2">0000</b></span>
+        <span><span data-i18n="best">best</span> <b id="rc">0000</b></span>
+      </div>
+      <div class="hud-group">
+        <span><span data-i18n="food">food</span> <b id="fd">0</b> (<span data-i18n="best">best</span> <b id="tf">0</b>)</span>
+      </div>
+      <div class="hud-group">
+        <span><span data-i18n="level_val">level</span> <b id="lv2">3</b></span>
+        <span><span data-i18n="tick">tick</span> <b id="ms">380ms</b></span>
+      </div>
+      <span id="bn"></span>
+    </div>
+
+    <div class="screen" id="scr">
+      <canvas id="c" width="576" height="384"></canvas>
+      <div class="ovl" id="ovl"></div>
+      <div class="codec hide" id="codec">
+        <div class="cf">
+          <div class="cp">
+            <pre> .-^^-.
+ |====|
+ |o  o|
+ | -- |
+  '--'</pre>
+            <b data-i18n="msg_idle">SNAKE</b>
+          </div>
+          <div class="cm">140.85<small data-i18n="codec_small">codec</small></div>
+          <div class="cp">
+            <pre id="codec-p2-img"> .----.
+ |____|
+ |(oo)|
+ | ^^ |
+  \__/ </pre>
+            <b id="codec-p2-name">MAJOR ZERO</b>
+          </div>
+        </div>
+        <div class="ct" id="ct"></div>
+        <div class="cx" data-i18n="touch_prompt">[ touch or press a key ]</div>
+      </div>
+    </div>
+
+    <div class="ctl">
+      <div class="pad">
+        <button data-d="U" style="grid-area:u" aria-label="su" data-i18n-aria="aria_up">▲</button>
+        <button data-d="L" style="grid-area:l" aria-label="sinistra" data-i18n-aria="aria_left">◀</button>
+        <button data-d="D" style="grid-area:d" aria-label="giù" data-i18n-aria="aria_down">▼</button>
+        <button data-d="R" style="grid-area:r" aria-label="destra" data-i18n-aria="aria_right">▶</button>
+      </div>
+      <div class="act">
+        <button id="bGo" data-i18n="btn_start">▶ start</button>
+        <button id="bMu" data-i18n="btn_sound_on">♪ sound: on</button>
+        <button id="bRs" data-i18n="btn_reset">⟲ reset stats</button>
+        <button id="bDl" data-i18n="btn_dl">↓ download snake.html</button>
+      </div>
+    </div>
+
+    <div class="opts">
+      <div class="row">
+        <b data-i18n="mode">$ mode</b>
+        <div id="modeSel">
+          <button class="tg opt mBtn" data-m="1" aria-pressed="true" data-i18n="mode_1p_on">[x] 1 Player</button>
+          <button class="tg opt mBtn" data-m="2" aria-pressed="false" data-i18n="mode_2p_off">[ ] 2 Players</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <b data-i18n="lan">$ lan</b>
+        <div>
+          <button class="tg opt" id="lH" data-i18n="lan_create">[ ] host game</button>
+          <button class="tg opt" id="lJ" data-i18n="lan_join">[ ] join</button>
+          <button class="tg hide" id="lX" data-i18n="lan_close">[x] close</button>
+        </div>
+        <span class="note" id="lanSt" data-i18n="lan_st_webrtc">WebRTC LAN play</span>
+      </div>
+
+      <div class="row hide" id="lanP">
+        <b data-i18n="code">$ code</b>
+        <div>
+          <textarea id="lOut" readonly rows="3" placeholder="your code" data-i18n-ph="ph_your_code"></textarea>
+          <button id="lCp" data-i18n="btn_copy">copy code</button>
+          <textarea id="lIn" rows="3" placeholder="paste friend's code here" data-i18n-ph="ph_friend_code"></textarea>
+          <button id="lGo" data-i18n="btn_connect">connect</button>
+        </div>
+      </div>
+
+      <div class="row hide" id="rIn1">
+        <b><span data-i18n="in_p1">$ in p1</span> <span style="color:var(--head)">■</span></b>
+        <div id="in1">
+          <button class="opt iBtn" data-p="1" data-i="wasd" aria-pressed="true">WASD</button>
+          <button class="opt iBtn" data-p="1" data-i="arrows" data-i18n="btn_arrows">Arrows</button>
+          <button class="opt iBtn" data-p="1" data-i="pad" data-i18n="btn_pad">Pad</button>
+          <button class="opt iBtn" data-p="1" data-i="touch" data-i18n="btn_touch">Touch</button>
+        </div>
+      </div>
+
+      <div class="row hide" id="rIn2">
+        <b><span data-i18n="in_p2">$ in p2</span> <span style="color:var(--red)">■</span></b>
+        <div id="in2">
+          <button class="opt iBtn" data-p="2" data-i="wasd">WASD</button>
+          <button class="opt iBtn" data-p="2" data-i="arrows" aria-pressed="true" data-i18n="btn_arrows">Arrows</button>
+          <button class="opt iBtn" data-p="2" data-i="pad" data-i18n="btn_pad">Pad</button>
+          <button class="opt iBtn" data-p="2" data-i="touch" data-i18n="btn_touch">Touch</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <b data-i18n="level">$ level</b>
+        <div id="lv"></div>
+        <span class="note" id="per"></span>
+      </div>
+
+      <div class="row">
+        <b data-i18n="walls">$ walls</b>
+        <button class="tg opt" id="tW" role="switch" data-i18n="walls_on">[x] walls</button>
+        <span class="note" data-i18n="walls_note">active = game over; inactive = wraps around</span>
+      </div>
+
+      <div class="row">
+        <b data-i18n="accel">$ accel</b>
+        <button class="tg opt" id="tA" role="switch" data-i18n="accel_off">[ ] acceleration</button>
+        <span class="note" data-i18n="accel_note">-20 ms every 5 prey, min 80 ms</span>
+      </div>
+
+      <div class="row">
+        <b data-i18n="palette">$ palette</b>
+        <div id="pal"></div>
+        <span class="note" data-i18n="palette_note">change theme</span>
+      </div>
+
+      <div class="row hide" id="rHdr">
+        <b data-i18n="hdr">$ hdr</b>
+        <div id="hdrSel"></div>
+        <span class="note" id="hdrNote" data-i18n="hdr_note"></span>
+      </div>
+
+      <div class="row">
+        <b data-i18n="lang_lbl">$ language</b>
+        <button class="tg" id="bLang"></button>
+      </div>
+    </div>
+
+    <div class="dash">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</div>
+    <div class="hint" data-i18n="hint_kbd">
+      <span style="white-space:nowrap">↑↓←→ / WASD / swipe move</span> ·
+      <span style="white-space:nowrap">space pause</span> ·
+      <span style="white-space:nowrap">enter start</span> ·
+      <span style="white-space:nowrap">1-9 level</span> ·
+      <span style="white-space:nowrap">M sound</span> ·
+      <span style="white-space:nowrap">T palette</span>
+    </div>
+  </div>
+</div>
+<script id="js">
+const $ = id => document.getElementById(id);
+
+const i18n = {
+  en: {
+    title: "Snake-WebRTC",
+    lang_lbl: "$ language",
+    score: "score",
+    p1: "P1",
+    p2: "P2",
+    best: "best",
+    food: "food",
+    level_val: "level",
+    tick: "tick",
+    btn_start: "▶ start",
+    btn_pause: "<span class=\"am\">❚❚ pause</span>",
+    btn_resume: "▶ resume",
+    btn_retry: "↻ retry",
+    btn_sound_on: "♪ sound: on",
+    btn_sound_off: "♪ sound: off",
+    btn_reset: "⟲ reset stats",
+    btn_dl: "↓ download snake.html",
+    mode: "$ mode",
+    mode_1p_on: "[x] 1 Player",
+    mode_1p_off: "[ ] 1 Player",
+    mode_2p_on: "[x] 2 Players",
+    mode_2p_off: "[ ] 2 Players",
+    lan: "$ lan",
+    lan_create: "[ ] host game",
+    lan_join: "[ ] join",
+    lan_close: "[x] close",
+    lan_st_webrtc: "WebRTC LAN play",
+    code: "$ code",
+    ph_your_code: "your code",
+    btn_copy: "copy code",
+    ph_friend_code: "paste friend's code here",
+    btn_connect: "connect",
+    in_p1: "$ in p1",
+    in_p2: "$ in p2",
+    btn_arrows: "Arrows",
+    btn_pad: "Pad",
+    btn_touch: "Touch",
+    level: "$ level",
+    base_tick: "base tick",
+    walls: "$ walls",
+    walls_on: "[x] walls",
+    walls_off: "[ ] walls",
+    walls_note: "active = game over; inactive = wraps around",
+    accel: "$ accel",
+    accel_on: "[x] acceleration",
+    accel_off: "[ ] acceleration",
+    accel_note: "-20 ms every 5 prey, min 80 ms",
+    palette: "$ palette",
+    palette_note: "change theme",
+    hdr: "$ hdr",
+    hdr_note: "adjust max HDR brightness",
+    hint_kbd: "<span style=\"white-space:nowrap\">↑↓←→ / WASD / swipe move</span> · <span style=\"white-space:nowrap\">space pause</span> · <span style=\"white-space:nowrap\">enter start</span> · <span style=\"white-space:nowrap\">1-9 level</span> · <span style=\"white-space:nowrap\">M sound</span> · <span style=\"white-space:nowrap\">T palette</span>",
+    touch_prompt: "[ touch or press a key ]",
+    aria_up: "up",
+    aria_left: "left",
+    aria_down: "down",
+    aria_right: "right",
+    msg_idle: "SNAKE",
+    msg_idle_sub: "space or touch to play",
+    msg_pause: "PAUSE",
+    msg_pause_sub: "space or touch to resume",
+    msg_over_zero: "Snake? Respond! Snake?!",
+    msg_over_zero_main: "SNAAAAAAAAKE!",
+    msg_over_main: "GAME OVER",
+    msg_win_main: "MISSION ACCOMPLISHED!",
+    msg_win_sub: "Operation \"Snake Eater\" completed",
+    msg_win_p1: "PLAYER 1 WINS!",
+    msg_win_p2: "PLAYER 2 WINS!",
+    msg_draw: "DRAW!",
+    msg_new_rec: "★ new record ★",
+    msg_retry: "enter or touch to retry",
+    confirm_reset: "Do you want to reset stats?",
+    codec_small: "codec",
+    host_p1: "<span style=\"color:var(--head)\">host · P1 ■</span>",
+    guest_p2: "<span style=\"color:var(--red)\">guest · P2 ■</span>",
+    lan_connected: " · connected · ping ",
+    lan_disconnected: "disconnected",
+    lan_closed: "closed",
+    lan_err: "error: ",
+    lan_err_closed: "connection closed",
+    lan_err_lost: "connection lost",
+    lan_connecting: "connecting…",
+    lan_host_step: "1) send your code to the guest  2) paste their answer and press connect",
+    lan_guest_step: "paste the host's code and press connect",
+    lan_host_wait: "send this code to the host",
+    bonus: "bonus",
+    pal_green: "green",
+    pal_amber: "amber",
+    pal_white: "white",
+    pal_cyan: "cyan",
+    pal_purple: "purple",
+    pal_red: "red",
+    cd_default: [
+      ['MAJOR ZERO', 'Snake, do you copy? This is Major Zero. Operation Snake Eater is a go.'],
+      ['SNAKE', 'Major... I\'m not in a Soviet jungle. I\'m a pixel snake inside a Nokia 3310 screen.'],
+      ['MAJOR ZERO', 'Tactical details are irrelevant. You\'ve been infiltrated into Finnish hardware designed to withstand the most extreme conditions.'],
+      ['SNAKE', 'I have no equipment. No weapons. Just... a colored dot to chase.'],
+      ['MAJOR ZERO', 'Exactly. The essence of FOX, pure and simple. Procure your food on-site and leave no traces.'],
+      ['SNAKE', 'Hard not to leave traces when my body gets longer every time I eat.'],
+      ['MAJOR ZERO', 'It doesn\'t matter where you fight, Snake. The only enemy you can\'t avoid is your own tail.'],
+      ['SNAKE', 'Can I at least hide in a cardboard box?'],
+      ['MAJOR ZERO', 'Negative. Just survive. Over and out.']
+    ],
+    cd_zero: [
+      ['MAJOR ZERO', 'Snake... you\'re dead already? You haven\'t even eaten a single rabbit!'],
+      ['SNAKE', 'Major, the controls... they weren\'t responding.'],
+      ['MAJOR ZERO', 'Don\'t blame the controls, Snake. CQC won\'t save you if you don\'t learn to make 90-degree turns.'],
+      ['SNAKE', 'And that vampire bat didn\'t look inviting at all. They taste terrible.'],
+      ['MAJOR ZERO', 'Don\'t make excuses. Your score is literally zero, just like my codename.'],
+      ['SNAKE', 'I got it, I got it. Let me try again. I just need to get used to the controls.'],
+      ['MAJOR ZERO', 'SNAAAAAAAAKE!']
+    ],
+    cd_win: [
+      ['MAJOR ZERO', 'Excellent work, Snake. You devoured everything there was. You survived the pixel jungle.'],
+      ['SNAKE', 'Major... I\'m about to explode. There\'s literally no more room to move.'],
+      ['SNAKE', 'I don\'t even remember what that last block I swallowed was!'],
+      ['MAJOR ZERO', 'I believe it was a very rare Tsuchinoko.'],
+      ['SNAKE', '...It was incredibly good! I want to eat more!'],
+      ['MAJOR ZERO', 'Restrain yourself, Snake. Anyway, you\'ve exceeded our expectations.'],
+      ['MAJOR ZERO', 'From today, you are awarded the title of Big Boss.'],
+      ['MAJOR ZERO', 'The President himself wants to shake your hand.'],
+      ['SNAKE', 'Very funny, Major. Now how do I get out of this screen?'],
+      ['MAJOR ZERO', 'That\'s the beauty of it, Snake: you can\'t. The game starts over.'],
+      ['MAJOR ZERO', 'Mission accomplished.']
+    ],
+    cd_multi: [
+      ['THE BOSS', 'I\'ve been waiting, Snake... for a long time.'],
+      ['THE BOSS', 'Waiting for your birth,'],
+      ['THE BOSS', 'your growth...'],
+      ['THE BOSS', 'and the finality of today...'],
+      ['SNAKE', 'Boss...'],
+      ['SNAKE', 'Why are you doing this?'],
+      ['THE BOSS', 'Why?'],
+      ['THE BOSS', 'Look at this screen, Snake. It\'s a closed grid. No matter how much we eat or how much we grow, space is bound to run out.'],
+      ['THE BOSS', 'I didn\'t raise you and shape you into the snake you are today just so we could face each other in battle.'],
+      ['THE BOSS', 'A soldier\'s skills aren\'t meant to be used to hurt friends.'],
+      ['THE BOSS', 'So then what is an enemy?'],
+      ['THE BOSS', 'Is there such a thing as an absolute timeless enemy?'],
+      ['THE BOSS', 'There is no such thing and never has been.'],
+      ['THE BOSS', 'And the reason is that our enemies are snakes like us.'],
+      ['THE BOSS', 'They can only be our enemies in relative terms.'],
+      ['THE BOSS', 'I raised you.'],
+      ['THE BOSS', 'I loved you. I\'ve given you weapons, taught you how to move in four directions.'],
+      ['THE BOSS', 'There\'s nothing more for me to give you.'],
+      ['THE BOSS', 'All that\'s left for you to take is my life.'],
+      ['THE BOSS', '...by your own hand.'],
+      ['THE BOSS', 'One must die and one must live.'],
+      ['THE BOSS', 'No victory, no defeat.'],
+      ['THE BOSS', 'The survivor will carry on the fight.'],
+      ['THE BOSS', 'It is our destiny...'],
+      ['THE BOSS', 'Whoever eats the most survives. Whoever touches the wall, or the other\'s body, dies.'],
+      ['THE BOSS', 'The one who survives will inherit the title of Boss.'],
+      ['SNAKE', 'Boss... why are we doing this? We\'re just two rows of colored pixels. Can\'t we just share the food?'],
+      ['THE BOSS', 'Jack...'],
+      ['THE BOSS', 'Or should I say... Snake...'],
+      ['THE BOSS', 'There\'s only room for one Boss.'],
+      ['THE BOSS', 'And one Snake...']
+    ]
+  },
+  it: {
+    title: "Snake-WebRTC",
+    lang_lbl: "$ lingua",
+    score: "punti",
+    p1: "P1",
+    p2: "P2",
+    best: "record",
+    food: "prede",
+    level_val: "livello",
+    tick: "tick",
+    btn_start: "▶ avvia",
+    btn_pause: "<span class=\"am\">❚❚ pausa</span>",
+    btn_resume: "▶ riprendi",
+    btn_retry: "↻ riprova",
+    btn_sound_on: "♪ suono: on",
+    btn_sound_off: "♪ suono: off",
+    btn_reset: "⟲ reset statistiche",
+    btn_dl: "↓ scarica snake.html",
+    mode: "$ mod",
+    mode_1p_on: "[x] 1 Giocatore",
+    mode_1p_off: "[ ] 1 Giocatore",
+    mode_2p_on: "[x] 2 Giocatori",
+    mode_2p_off: "[ ] 2 Giocatori",
+    lan: "$ lan",
+    lan_create: "[ ] crea partita",
+    lan_join: "[ ] unisciti",
+    lan_close: "[x] chiudi",
+    lan_st_webrtc: "WebRTC LAN play",
+    code: "$ codice",
+    ph_your_code: "il tuo codice",
+    btn_copy: "copia codice",
+    ph_friend_code: "incolla qui il codice dell'amico",
+    btn_connect: "connetti",
+    in_p1: "$ in p1",
+    in_p2: "$ in p2",
+    btn_arrows: "Frecce",
+    btn_pad: "Pad",
+    btn_touch: "Touch",
+    level: "$ livello",
+    base_tick: "periodo base",
+    walls: "$ muri",
+    walls_on: "[x] muri",
+    walls_off: "[ ] muri",
+    walls_note: "attivi = game over; disattivi = spunta dal lato opposto",
+    accel: "$ accel",
+    accel_on: "[x] accelerazione",
+    accel_off: "[ ] accelerazione",
+    accel_note: "-20 ms ogni 5 prede, minimo 90 ms",
+    palette: "$ palette",
+    palette_note: "cambia tema",
+    hdr: "$ hdr",
+    hdr_note: "regola la luminosità massima HDR",
+    hint_kbd: "<span style=\"white-space:nowrap\">↑↓←→ / WASD / swipe muovi</span> · <span style=\"white-space:nowrap\">spazio pausa</span> · <span style=\"white-space:nowrap\">invio avvia</span> · <span style=\"white-space:nowrap\">1-9 livello</span> · <span style=\"white-space:nowrap\">M suono</span> · <span style=\"white-space:nowrap\">T palette</span>",
+    touch_prompt: "[ tocca o premi un tasto ]",
+    aria_up: "su",
+    aria_left: "sinistra",
+    aria_down: "giù",
+    aria_right: "destra",
+    msg_idle: "SNAKE",
+    msg_idle_sub: "spazio o tocca per giocare",
+    msg_pause: "PAUSA",
+    msg_pause_sub: "spazio o tocca per riprendere",
+    msg_over_zero: "Snake? Rispondi! Snake?!",
+    msg_over_zero_main: "SNAAAAAAAAKE!",
+    msg_over_main: "GAME OVER",
+    msg_win_main: "MISSIONE COMPIUTA!",
+    msg_win_sub: "Operazione \"Snake Eater\" completata",
+    msg_win_p1: "GIOCATORE 1 VINCE!",
+    msg_win_p2: "GIOCATORE 2 VINCE!",
+    msg_draw: "PAREGGIO!",
+    msg_new_rec: "★ nuovo record ★",
+    msg_retry: "invio o tocca per riprovare",
+    confirm_reset: "Vuoi azzerare le statistiche?",
+    codec_small: "codec",
+    host_p1: "<span style=\"color:var(--head)\">host · P1 ■</span>",
+    guest_p2: "<span style=\"color:var(--red)\">ospite · P2 ■</span>",
+    lan_connected: " · connesso · ping ",
+    lan_disconnected: "disconnesso",
+    lan_closed: "chiuso",
+    lan_err: "errore: ",
+    lan_err_closed: "connessione chiusa",
+    lan_err_lost: "connessione persa",
+    lan_connecting: "connessione in corso…",
+    lan_host_step: "1) manda il tuo codice all'ospite  2) incolla la sua risposta e premi connetti",
+    lan_guest_step: "incolla il codice dell'host e premi connetti",
+    lan_host_wait: "manda questo codice all'host",
+    bonus: "bonus",
+    pal_green: "verde",
+    pal_amber: "ambra",
+    pal_white: "bianco",
+    pal_cyan: "ciano",
+    pal_purple: "viola",
+    pal_red: "rosso",
+    cd_default: [
+      ['MAJOR ZERO', 'Snake, mi ricevi? Qui è il Maggiore Zero. L\'Operazione "Snake Eater" ha inizio.'],
+      ['SNAKE', 'Maggiore... non sono in una giungla sovietica. Sono un serpente di pixel dentro lo schermo di un Nokia 3310.'],
+      ['MAJOR ZERO', 'I dettagli tattici sono irrilevanti. Sei stato infiltrato in un hardware finlandese progettato per resistere alle condizioni più estreme.'],
+      ['SNAKE', 'Non ho equipaggiamento. Non ho armi. Solo... un puntino colorato da inseguire.'],
+      ['MAJOR ZERO', 'Esatto. L\'essenza della FOX, nuda e pura. Procurati il cibo sul campo e non lasciare tracce.'],
+      ['SNAKE', 'Difficile non lasciare tracce quando il mio corpo si allunga ogni volta che mangio.'],
+      ['MAJOR ZERO', 'Non importa dove combatti, Snake. L’unico nemico che non puoi evitare è la tua stessa coda.'],
+      ['SNAKE', 'Posso almeno nascondermi in una scatola di cartone?'],
+      ['MAJOR ZERO', 'Negativo. Sopravvivi e basta. Passo e chiudo.']
+    ],
+    cd_zero: [
+      ['MAJOR ZERO', 'Snake... sei morto di già? Non hai mangiato nemmeno un coniglio!'],
+      ['SNAKE', 'Maggiore, i controlli... non rispondevano.'],
+      ['MAJOR ZERO', 'Non dare la colpa ai comandi, Snake. Il CQC non ti salverà se non impari a fare le curve a 90 gradi.'],
+      ['SNAKE', 'E quel pipistrello vampiro non mi sembrava affatto invitante. Hanno un sapore orribile.'],
+      ['MAJOR ZERO', 'Non cercare scuse. Il tuo punteggio è letteralmente zero, esattamente come il mio nome in codice.'],
+      ['SNAKE', 'Ho capito, ho capito. Fammi riprovare. Devo solo abituarmi ai comandi.'],
+      ['MAJOR ZERO', 'SNAAAAAAAAKE!']
+    ],
+    cd_win: [
+      ['MAJOR ZERO', 'Ottimo lavoro, Snake. Hai divorato tutto quello che c\'era. Sei sopravvissuto alla giungla di pixel.'],
+      ['SNAKE', 'Maggiore... sto per esplodere. Non c\'è letteralmente più spazio per muovermi.'],
+      ['SNAKE', 'Non ricordo neanche cos\'era quell\'ultimo blocco che ho ingoiato!'],
+      ['MAJOR ZERO', 'Credo fosse un rarissimo Tsuchinoko.'],
+      ['SNAKE', '...Era incredibilmente buono!. Voglio mangiarne ancora!'],
+      ['MAJOR ZERO', 'Trattieniti, Snake. In ogni caso, hai superato le nostre aspettative.'],
+      ['MAJOR ZERO', 'Da oggi ti è stato conferito il titolo di Big Boss.'],
+      ['MAJOR ZERO', 'Il Presidente in persona vuole stringerti la mano.'],
+      ['SNAKE', 'Molto divertente, Maggiore. Ora come esco da questo schermo?'],
+      ['MAJOR ZERO', 'È questo il bello, Snake: non puoi. Il gioco ricomincia.'],
+      ['MAJOR ZERO', 'Missione compiuta.']
+    ],
+    cd_multi: [
+      ['THE BOSS', 'Ho aspettato, Snake... Per tanto tempo.'],
+      ['THE BOSS', 'Aspettato che tu nascessi,'],
+      ['THE BOSS', 'crescessi...'],
+      ['THE BOSS', 'e la finalità di oggi...'],
+      ['SNAKE', 'Boss...'],
+      ['SNAKE', 'Perché fa questo?'],
+      ['THE BOSS', 'Perché?'],
+      ['THE BOSS', 'Guarda questo schermo, Snake. È una griglia chiusa. Non importa quanto mangiamo o quanto cresciamo, lo spazio è destinato a finire.'],
+      ['THE BOSS', 'Non ti ho allevato e trasformato nel serpente che sei oggi solo perché potessimo affrontarci in battaglia.'],
+      ['THE BOSS', 'Le capacità di un soldato non sono fatte per essere usate per colpire gli amici.'],
+      ['THE BOSS', 'Allora cos\'è un nemico?'],
+      ['THE BOSS', 'Esiste un nemico assoluto, immutabile nel tempo?'],
+      ['THE BOSS', 'Non esiste una cosa del genere e non è mai esistita.'],
+      ['THE BOSS', 'Per il semplice motivo che i nostri nemici sono serpenti come noi.'],
+      ['THE BOSS', 'Possono essere nemici solo in senso relativo.'],
+      ['THE BOSS', 'Ti ho allevato.'],
+      ['THE BOSS', 'Ti ho amato. Ti ho dato le armi, insegnato come muoverti in quattro direzioni.'],
+      ['THE BOSS', 'Non c\'è altro che io possa darti.'],
+      ['THE BOSS', 'Non ti rimane che prendere la mia vita.'],
+      ['THE BOSS', '...con le tue stesse mani.'],
+      ['THE BOSS', 'Uno deve morire e uno deve vivere.'],
+      ['THE BOSS', 'Nessuna vittoria, nessuna sconfitta.'],
+      ['THE BOSS', 'Chi sopravvive porterà avanti la lotta.'],
+      ['THE BOSS', 'È il nostro destino...'],
+      ['THE BOSS', 'Chi mangia di più sopravvive. Chi tocca il muro, o il corpo dell\'altro, muore.'],
+      ['THE BOSS', 'Chi sopravvive erediterà il titolo di The Boss.'],
+      ['SNAKE', 'Boss... perché stiamo facendo questo? Siamo solo due file di pixel colorati. Non possiamo semplicemente dividerci il cibo?'],
+      ['THE BOSS', 'Jack...'],
+      ['THE BOSS', 'O dovrei dire... Snake...'],
+      ['THE BOSS', 'C\'è spazio per un solo Boss.'],
+      ['THE BOSS', 'E per un solo Snake...']
+    ]
+  }
+};
+
+const availableLangs = Object.keys(i18n);
+let savedLang;
+try {
+  savedLang = localStorage.getItem('snake.lang');
+} catch (e) {}
+
+const browserLang = navigator.language.split('-')[0];
+let lang = savedLang || (availableLangs.includes(browserLang) ? browserLang : availableLangs[0]);
+const t = k => (i18n[lang] && i18n[lang][k] !== undefined) ? i18n[lang][k] : k;
+
+function applyI18n() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.innerHTML = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    el.placeholder = t(el.getAttribute('data-i18n-ph'));
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+    el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')));
+  });
+  document.title = t('title');
+
+  const bLang = $('bLang');
+  if (bLang) {
+    let langName = lang;
+    try {
+      langName = new Intl.DisplayNames([lang], { type: 'language' }).of(lang).toLowerCase();
+    } catch (e) {}
+    bLang.textContent = `[${lang}] ${langName}`;
+  }
+}
+
+applyI18n();
+
+document.querySelector('.btn-r').addEventListener('click', () => {
+  if (window.parent !== window) {
+    window.parent.postMessage({ type: 'snake-close' }, '*');
+  }
+});
+
+try {
+  if (window.self !== window.top) {
+    document.documentElement.classList.add('is-iframe');
+  }
+} catch (e) {
+  document.documentElement.classList.add('is-iframe');
+}
+
+const APP_HTML = $('app').outerHTML;
+const COLS = 24;
+const ROWS = 16;
+const S = 24;
+const W = COLS * S;
+const H = ROWS * S;
+const BONUS_TICKS = 30;
+const PERIODS = [660, 480, 380, 300, 230, 180, 140, 110, 90];
+const DIRS = { U: [0, -1], D: [0, 1], L: [-1, 0], R: [1, 0] };
+const OPP = { U: 'D', D: 'U', L: 'R', R: 'L' };
+const KEYS_W = { w: 'U', s: 'D', a: 'L', d: 'R' };
+const KEYS_A = { arrowup: 'U', arrowdown: 'D', arrowleft: 'L', arrowright: 'R' };
+const cfg = { level: 3, walls: true, accel: false, mode: 1, p1: 'wasd', p2: 'arrows' };
+
+const isHDR = window.matchMedia('(dynamic-range: high)').matches;
+const DPR = window.devicePixelRatio || 1;
+const c_canvas = $('c');
+c_canvas.width = W * DPR;
+c_canvas.height = H * DPR;
+const ctx = c_canvas.getContext('2d', { colorSpace: isHDR ? 'display-p3' : 'srgb' });
+ctx.scale(DPR, DPR);
+let CURRENT_PALETTE = {};
+
+const BLOOM = (() => {
+  const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bloom'));
+  return isNaN(v) ? 0.5 : v;
+})();
+
+const hdrGPU = { on: false, peak: 4, linear: true };
+try {
+  const v = parseFloat(localStorage.getItem('snake.hdrpeak'));
+  if (v >= 1 && v <= 16) hdrGPU.peak = v;
+} catch (e) {}
+
+let players = [];
+let food;
+let bonus;
+let eaten;
+let state = 'idle';
+let timer;
+let newRec = false;
+let record = 0;
+let maxFood = 0;
+let mute = false;
+let overLock = false;
+let deathOrder = [];
+let won = false;
+let dialogState = 'default';
+
+try {
+  record = +localStorage.getItem('snake.record') || 0;
+  maxFood = +localStorage.getItem('snake.maxFood') || 0;
+  mute = localStorage.getItem('snake.mute') === '1';
+} catch (e) {}
+
+const pad = n => String(n).padStart(4, '0');
+const rnd = n => Math.floor(Math.random() * n);
+const period = () => cfg.accel
+  ? Math.max(80, PERIODS[cfg.level - 1] - 20 * Math.floor(eaten / 5))
+  : PERIODS[cfg.level - 1];
+
+function free() {
+  let len = 0;
+  players.forEach(p => {
+    len += p.snake.length;
+  });
+  if (len >= COLS * ROWS - 2) return null;
+
+  for (let i = 0; i < 1000; i++) {
+    const pt = { x: rnd(COLS), y: rnd(ROWS) };
+    const onSnake = players.some(p => p.snake.some(s => s.x === pt.x && s.y === pt.y));
+    const onFood = food && food.x === pt.x && food.y === pt.y;
+    const onBonus = bonus && bonus.x === pt.x && bonus.y === pt.y;
+    if (!onSnake && !onFood && !onBonus) return pt;
+  }
+  return null;
+}
+
+function reset() {
+  net.g = (net.g + 1) & 255;
+  net.k = 0;
+
+  if (cfg.mode === 1) {
+    players = [
+      {
+        id: 1,
+        snake: [{ x: 8, y: 8 }, { x: 7, y: 8 }, { x: 6, y: 8 }, { x: 5, y: 8 }],
+        dir: 'R',
+        queue: [],
+        score: 0,
+        dead: false
+      }
+    ];
+  } else {
+    players = [
+      {
+        id: 1,
+        snake: [{ x: 8, y: 5 }, { x: 7, y: 5 }, { x: 6, y: 5 }, { x: 5, y: 5 }],
+        dir: 'R',
+        queue: [],
+        score: 0,
+        dead: false
+      },
+      {
+        id: 2,
+        snake: [{ x: 15, y: 10 }, { x: 16, y: 10 }, { x: 17, y: 10 }, { x: 18, y: 10 }],
+        dir: 'L',
+        queue: [],
+        score: 0,
+        dead: false
+      }
+    ];
+  }
+
+  eaten = 0;
+  bonus = null;
+  newRec = false;
+  deathOrder = [];
+  won = false;
+  food = null;
+  food = free();
+  hud();
+  draw();
+}
+
+function set(s) {
+  state = s;
+  document.querySelectorAll('.opt').forEach(b => {
+    b.disabled = s === 'run' || isCli();
+  });
+  $('bGo').innerHTML = {
+    idle: t('btn_start'),
+    run: t('btn_pause'),
+    pause: t('btn_resume'),
+    over: t('btn_retry')
+  }[s];
+  const o = $('ovl');
+  o.className = 'ovl' + (s === 'run' ? ' hide' : '');
+  updateInpUI();
+  netState();
+}
+
+function hud() {
+  if (cfg.mode === 1) {
+    $('sc').textContent = pad(players[0].score);
+    $('sc0c').className = '';
+    $('sc1c').className = 'hide';
+    $('sc2c').className = 'hide';
+  } else {
+    $('sc1').textContent = pad(players[0].score);
+    $('sc2').textContent = pad(players[1].score);
+    $('sc0c').className = 'hide';
+    $('sc1c').className = '';
+    $('sc2c').className = '';
+  }
+
+  $('rc').textContent = pad(Math.max(record, players.reduce((m, p) => Math.max(m, p.score), 0)));
+  $('fd').textContent = eaten;
+  $('tf').textContent = maxFood;
+  $('lv2').textContent = cfg.level;
+  $('ms').textContent = period() + 'ms';
+  $('per').textContent = t('base_tick') + ' ' + PERIODS[cfg.level - 1] + ' ms';
+
+  const n = bonus ? Math.ceil(bonus.t / 3) : 0;
+  $('bn').textContent = t('bonus') + ' [' + '#'.repeat(n) + '-'.repeat(10 - n) + ']';
+  $('bn').style.visibility = bonus ? 'visible' : 'hidden';
+}
+
+function draw(isOver) {
+  const g = ctx;
+  const P = CURRENT_PALETTE;
+
+  g.filter = state !== 'run' ? 'blur(4px)' : 'none';
+  g.shadowBlur = 0;
+  g.fillStyle = P['--cbg'];
+  g.fillRect(0, 0, W, H);
+
+  g.fillStyle = P['--dot'];
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      g.fillRect(x * S + 11, y * S + 11, 2, 2);
+    }
+  }
+
+  g.strokeStyle = cfg.walls ? P['--wall-on'] : P['--wall-off'];
+  g.lineWidth = cfg.walls ? 4 : 2;
+  g.setLineDash(cfg.walls ? [] : [6, 6]);
+  g.strokeRect(2, 2, W - 4, H - 4);
+  g.setLineDash([]);
+
+  players.forEach((p, idx) => {
+    if (p.dead || p.snake.length === 0) return;
+    let hc = isOver
+      ? (isHDR ? 'color(display-p3 1 0.4 0.4)' : '#ffb0b0')
+      : (idx === 0 ? P['--head'] : P['--red']);
+    if (won) hc = isHDR ? 'color(display-p3 1 1 1)' : '#ffffff';
+    const bc = idx === 0 ? P['--fg'] : P['--amb'];
+
+    g.shadowColor = bc;
+    g.shadowBlur = (isHDR ? 18 : 12) * BLOOM;
+    p.snake.forEach((pt, i) => {
+      g.fillStyle = i === 0 ? hc : bc;
+      g.fillRect(pt.x * S + 3, pt.y * S + 3, S - 6, S - 6);
+    });
+  });
+
+  if (food) {
+    g.fillStyle = P['--food'];
+    g.shadowColor = P['--food'];
+    const cx = food.x * S + S / 2;
+    const cy = food.y * S + S / 2;
+    [[-3, -9], [-3, 3], [-9, -3], [3, -3]].forEach(([a, b]) => {
+      g.fillRect(cx + a, cy + b, 6, 6);
+    });
+  }
+
+  if (bonus && (bonus.t > 9 || bonus.t % 2)) {
+    const bx = bonus.x * S;
+    const by = bonus.y * S;
+    g.fillStyle = g.strokeStyle = P['--amb'];
+    g.shadowColor = P['--amb'];
+    g.lineWidth = 3;
+    g.strokeRect(bx + 4.5, by + 4.5, S - 9, S - 9);
+    g.fillRect(bx + 9, by + 9, 6, 6);
+  }
+
+  if (state !== 'run') {
+    g.filter = 'none';
+    g.shadowBlur = 0;
+    g.fillStyle = 'rgba(0,0,0,0.6)';
+    g.fillRect(0, 0, W, H);
+
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    if (g.letterSpacing !== undefined) g.letterSpacing = '1px';
+
+    const cy = H / 2;
+    const lines = [];
+    const fBig = '43px "VT323", monospace';
+    const fMed = '27px "VT323", monospace';
+    const fSml = '22px "VT323", monospace';
+
+    if (state === 'idle') {
+      lines.push({ t: t('msg_idle'), f: fBig, c: P['--head'], g: P['--glow'], g2: P['--head'], b: 12, h: 43 });
+      lines.push({ t: t('msg_idle_sub'), f: fSml, c: P['--fg'], g: P['--glow'], b: 5, h: 22 });
+    } else if (state === 'pause') {
+      lines.push({ t: t('msg_pause'), f: fBig, c: P['--amb'], g: P['--amb'], g2: P['--head'], b: 12, h: 43 });
+      lines.push({ t: t('msg_pause_sub'), f: fSml, c: P['--fg'], g: P['--glow'], b: 5, h: 22 });
+    } else if (state === 'over') {
+      let sub = eaten === 0 ? t('msg_over_zero') : '';
+      let msg = eaten === 0 ? t('msg_over_zero_main') : t('msg_over_main');
+      let cMain = P['--red'];
+      let cGlow = P['--red'];
+
+      if (won) {
+        msg = t('msg_win_main');
+        sub = t('msg_win_sub');
+        cMain = P['--head'];
+        cGlow = P['--glow'];
+      } else if (cfg.mode === 2 && deathOrder.length > 0) {
+        if (deathOrder.length === 2) {
+          const winner = deathOrder[0][0] === 1 ? 2 : 1;
+          msg = winner === 1 ? t('msg_win_p1') : t('msg_win_p2');
+        } else if (deathOrder.length === 1 && deathOrder[0].length === 2) {
+          msg = t('msg_draw');
+        }
+      }
+
+      if (sub) {
+        lines.push({ t: sub, f: fSml, c: P['--fg'], g: P['--glow'], b: 5, h: 22 });
+      }
+      lines.push({ t: msg, f: fBig, c: cMain, g: cGlow, g2: P['--head'], b: 12, h: 43 });
+
+      if (cfg.mode === 1) {
+        lines.push({ t: `${t('score')} ${pad(players[0].score)}`, f: fMed, c: P['--head'], g: P['--glow'], b: 8, h: 27 });
+      } else {
+        lines.push({ t: `${t('p1')}: ${pad(players[0].score)} - ${t('p2')}: ${pad(players[1].score)}`, f: fMed, c: P['--head'], g: P['--glow'], b: 8, h: 27 });
+      }
+
+      if (newRec) {
+        lines.push({ t: t('msg_new_rec'), f: fMed, c: P['--amb'], g: P['--amb'], b: 10, h: 27 });
+      }
+
+      lines.push({
+        t: t('msg_retry'),
+        f: fSml,
+        c: overLock ? 'transparent' : P['--fg'],
+        g: overLock ? 'transparent' : P['--glow'],
+        b: 5,
+        h: 22
+      });
+    }
+
+    const gap = 13;
+    const totalHeight = lines.reduce((sum, l) => sum + l.h, 0) + gap * (lines.length - 1);
+    let currentY = cy - totalHeight / 2;
+
+    lines.forEach(l => {
+      g.font = l.f;
+      g.fillStyle = l.c;
+
+      if (l.g && l.g !== 'transparent') {
+        if (l.g2) {
+          g.shadowColor = l.g2;
+          g.shadowBlur = l.b * 2 * BLOOM * (isHDR ? 1.5 : 1);
+          g.fillText(l.t, W / 2, currentY + l.h / 2);
+        }
+        g.shadowColor = l.g;
+        g.shadowBlur = l.b * BLOOM * (isHDR ? 1.5 : 1);
+        g.fillText(l.t, W / 2, currentY + l.h / 2);
+      }
+
+      g.shadowBlur = 0;
+      g.fillText(l.t, W / 2, currentY + l.h / 2);
+      currentY += l.h + gap;
+    });
+
+    if (g.letterSpacing !== undefined) g.letterSpacing = '0px';
+  }
+
+  g.shadowBlur = 0;
+  if (hdrGPU.on) hdrPresent();
+}
+
+function tick() {
+  net.k = (net.k + 1) & 65535;
+
+  players.forEach(p => {
+    if (p.dead) return;
+    p.dir = p.queue.shift() || p.dir;
+    const [dx, dy] = DIRS[p.dir];
+    p.h = { x: p.snake[0].x + dx, y: p.snake[0].y + dy };
+    if (!cfg.walls) {
+      p.h.x = (p.h.x + COLS) % COLS;
+      p.h.y = (p.h.y + ROWS) % ROWS;
+    }
+    p.willDie = false;
+  });
+
+  players.forEach(p => {
+    if (p.dead) return;
+    if (cfg.walls && (p.h.x < 0 || p.h.x >= COLS || p.h.y < 0 || p.h.y >= ROWS)) {
+      p.willDie = true;
+      return;
+    }
+    players.forEach(other => {
+      if (other.dead) return;
+      const eatF = food && p.h.x === food.x && p.h.y === food.y;
+      let body = other.snake;
+      if (other === p && !eatF) body = body.slice(0, -1);
+      if (body.some(s => s.x === p.h.x && s.y === p.h.y)) {
+        p.willDie = true;
+      }
+    });
+  });
+
+  if (cfg.mode === 2 && !players[0].dead && !players[1].dead) {
+    if (players[0].h.x === players[1].h.x && players[0].h.y === players[1].h.y) {
+      players[0].willDie = true;
+      players[1].willDie = true;
+    }
+  }
+
+  const diedThisTick = [];
+  players.forEach(p => {
+    if (!p.dead && p.willDie) {
+      p.dead = true;
+      p.snake = [];
+      diedThisTick.push(p.id);
+    }
+  });
+
+  if (diedThisTick.length > 0) {
+    sfx.die();
+    deathOrder.push(diedThisTick);
+  }
+
+  let fEaten = false;
+  let bEaten = false;
+
+  players.forEach(p => {
+    if (p.dead) return;
+    const eatF = food && p.h.x === food.x && p.h.y === food.y;
+    const eatB = bonus && p.h.x === bonus.x && p.h.y === bonus.y;
+
+    p.snake.unshift(p.h);
+    if (!eatF) {
+      p.snake.pop();
+    } else {
+      p.score += 7 * cfg.level;
+      eaten++;
+      fEaten = true;
+      if (eaten > maxFood) {
+        maxFood = eaten;
+        try {
+          localStorage.setItem('snake.maxFood', maxFood);
+        } catch (e) {}
+      }
+      if (p.score > record) {
+        record = p.score;
+        newRec = true;
+        try {
+          localStorage.setItem('snake.record', record);
+        } catch (e) {}
+      }
+    }
+
+    if (eatB) {
+      p.score += cfg.level * (10 + bonus.t);
+      bEaten = true;
+      bonus = null;
+      if (p.score > record) {
+        record = p.score;
+        newRec = true;
+        try {
+          localStorage.setItem('snake.record', record);
+        } catch (e) {}
+      }
+    }
+  });
+
+  if (fEaten) {
+    sfx.eat();
+    food = free();
+    if (!food) {
+      won = true;
+      return over();
+    }
+    if (eaten % 5 === 0) {
+      const bp = free();
+      if (bp) {
+        bonus = { x: bp.x, y: bp.y, t: BONUS_TICKS };
+        sfx.alert();
+      }
+    }
+  }
+
+  if (bEaten) {
+    sfx.bonus();
+  } else if (bonus && --bonus.t <= 0) {
+    bonus = null;
+  }
+
+  if (players.every(p => p.dead)) return over();
+  netSnap();
+  draw();
+  hud();
+}
+
+function loop() {
+  tick();
+  if (state === 'run') {
+    const n = performance.now();
+    net.nt += period();
+    if (net.nt < n) net.nt = n;
+    timer = setTimeout(loop, net.nt - n);
+  }
+}
+
+function over() {
+  clearTimeout(timer);
+  set('over');
+  hud();
+
+  if (won) {
+    dialogState = 'win';
+    setTimeout(sfx.win, 200);
+  } else if (eaten === 0) {
+    dialogState = 'zero';
+  } else {
+    dialogState = 'default';
+  }
+
+  if (!won && newRec) {
+    setTimeout(sfx.rec, 800);
+  }
+
+  overLock = true;
+  draw(true);
+  setTimeout(() => {
+    overLock = false;
+    if (state === 'over') draw(true);
+  }, 1000);
+}
+
+function start() {
+  if (isCli()) {
+    netCtl({ t: 'req', a: 'start' });
+    return;
+  }
+  if (state === 'run' || codecOpen() || (state === 'over' && overLock)) return;
+  if (state === 'over') reset();
+  set('run');
+  sfx.go();
+  clearTimeout(timer);
+  draw();
+  net.nt = performance.now() + 1000;
+  timer = setTimeout(loop, 1000);
+}
+
+function pause() {
+  if (isCli()) {
+    netCtl({ t: 'req', a: 'pause' });
+    return;
+  }
+  clearTimeout(timer);
+  set('pause');
+  beep(330, .06);
+  draw();
+}
+
+function toggle() {
+  if (state === 'over' && overLock) return;
+  state === 'run' ? pause() : start();
+}
+
+function turnP(d, pIdx) {
+  if (codecOpen() || (state === 'over' && overLock)) return;
+  if (state !== 'run') start();
+  const p = players[pIdx];
+  if (!p || p.dead) return;
+  const last = p.queue.length ? p.queue[p.queue.length - 1] : p.dir;
+  if (d !== last && d !== OPP[last] && p.queue.length < 2) {
+    p.queue.push(d);
+  }
+}
+
+let AC = null;
+
+function beep(f, d, t0 = 0, ty = 'square', v = .2) {
+  if (mute) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === 'suspended') AC.resume();
+    const o = AC.createOscillator();
+    const g = AC.createGain();
+    const a = AC.currentTime + t0;
+    o.type = ty;
+    o.frequency.value = f;
+    g.gain.setValueAtTime(v, a);
+    g.gain.exponentialRampToValueAtTime(.0001, a + d);
+    o.connect(g);
+    g.connect(AC.destination);
+    o.start(a);
+    o.stop(a + d + .02);
+  } catch (e) {}
+}
+
+const seq = (ns, d, gap, ty, v, t0 = 0) => {
+  ns.forEach((f, i) => beep(f, d, t0 + i * gap, ty, v));
+};
+
+const sfx = {
+  go: () => seq([523, 784], .07, .07),
+  eat: () => seq([988, 1319], .06, .06),
+  bonus: () => seq([659, 784, 988, 1319, 1568], .2, .07),
+  alert: () => seq([1760, 1760], .06, .09, 'sawtooth', .2, .15),
+  die: () => seq([392, 330, 262, 196, 131], .16, .15, 'sawtooth'),
+  rec: () => seq([523, 659, 784, 1046], .14, .14, 'square', .3, .9),
+  ring: () => seq([1568, 1568, 1568], .08, .14, 'sine'),
+  conn: () => seq([523, 659, 784, 1046], .08, .08, 'square', .2),
+  lost: () => seq([880, 659, 440], .12, .12, 'sawtooth', .2),
+  win: () => {
+    const brassNote = (f, start, sus, fade) => {
+      if (mute) return;
+      try {
+        AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+        if (AC.state === 'suspended') AC.resume();
+        const a = AC.currentTime + start;
+
+        const o = AC.createOscillator();
+        o.type = 'sawtooth';
+        o.frequency.value = f;
+
+        const lfo = AC.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.value = 5.5;
+
+        const lfoGain = AC.createGain();
+        lfoGain.gain.value = f * 0.015;
+        lfo.connect(lfoGain);
+        lfoGain.connect(o.frequency);
+
+        const filter = AC.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.Q.value = 4.5;
+        filter.frequency.setValueAtTime(f * 0.8, a);
+        filter.frequency.exponentialRampToValueAtTime(f * 6, a + 0.035);
+        filter.frequency.exponentialRampToValueAtTime(f * 2.5, a + 0.15);
+
+        const g = AC.createGain();
+        g.gain.setValueAtTime(0, a);
+        g.gain.linearRampToValueAtTime(0.2, a + 0.02);
+        g.gain.linearRampToValueAtTime(0.15, a + 0.08);
+        g.gain.setValueAtTime(0.15, a + sus);
+        g.gain.exponentialRampToValueAtTime(0.0001, a + sus + fade);
+
+        o.connect(filter);
+        filter.connect(g);
+        g.connect(AC.destination);
+        o.start(a);
+        lfo.start(a);
+        o.stop(a + sus + fade + 0.1);
+        lfo.stop(a + sus + fade + 0.1);
+      } catch (e) {}
+    };
+
+    brassNote(415.30, 0.000, 0.44, 0.05);
+    brassNote(440.00, 0.450, 0.25, 0.18);
+    brassNote(554.37, 0.885, 0.25, 0.18);
+    brassNote(698.46, 1.355, 3.25, 0.50);
+  }
+};
+
+function setMute(m) {
+  mute = m;
+  try {
+    localStorage.setItem('snake.mute', m ? '1' : '0');
+  } catch (e) {}
+  $('bMu').textContent = m ? t('btn_sound_off') : t('btn_sound_on');
+}
+
+const cod = $('codec');
+let ci = 0;
+let typing = false;
+let ctm;
+let fastFwd = false;
+const codecOpen = () => !cod.classList.contains('hide');
+
+function getActiveCodecData() {
+  if (dialogState === 'win') return t('cd_win');
+  if (dialogState === 'zero') return t('cd_zero');
+  if (cfg.mode === 2) return t('cd_multi');
+  return t('cd_default');
+}
+
+function say() {
+  const CD = getActiveCodecData();
+  const [w, txt] = CD[ci];
+  const el = $('ct');
+  const sn = w === 'SNAKE';
+  let n = 0;
+
+  clearInterval(ctm);
+  typing = true;
+  fastFwd = false;
+  el.innerHTML = '<b class="' + (sn ? 's' : 'c') + '">' + w + ':</b> <span></span><span class="cur2" style="color:var(--fg)">█</span>';
+
+  const sp = el.children[1];
+  const curs = el.children[2];
+  ctm = setInterval(() => {
+    sp.textContent = txt.slice(0, ++n);
+    if (n % 3 === 0) beep(sn ? 520 : 420, .02, 0, 'square', .1);
+    if (n >= txt.length) {
+      clearInterval(ctm);
+      typing = false;
+      curs.classList.add('cur');
+    }
+  }, 28);
+}
+
+function codecShow() {
+  if (codecOpen()) return;
+  if (state === 'run') pause();
+  ci = 0;
+
+  const CD = getActiveCodecData();
+  const p2Name = CD.find(line => line[0] !== 'SNAKE')[0] || 'MAJOR ZERO';
+  $('codec-p2-name').textContent = p2Name;
+
+  const asciiZero = " .----.\n |____|\n |(oo)|\n | ^^ |\n  \\__/";
+  const asciiBoss = " ,~~~~.\n |////|\n |o  o|\n | -- |\n  \\__/";
+  $('codec-p2-img').textContent = p2Name === 'THE BOSS' ? asciiBoss : asciiZero;
+  document.querySelector('.cm').innerHTML = (p2Name === 'THE BOSS' ? '141.80' : '140.85') + '<small>' + t('codec_small') + '</small>';
+  $('ct').innerHTML = `<b class="c">${p2Name}:</b> <span></span><span class="cur2 cur" style="color:var(--fg)">█</span>`;
+
+  cod.classList.remove('hide');
+  sfx.ring();
+  setTimeout(say, 450);
+}
+
+function codecClose() {
+  clearInterval(ctm);
+  typing = false;
+  cod.classList.add('hide');
+}
+
+function codecTap() {
+  const CD = getActiveCodecData();
+  if (typing) {
+    if (!fastFwd) {
+      fastFwd = true;
+      clearInterval(ctm);
+      const [w, txt] = CD[ci];
+      const el = $('ct');
+      const sn = w === 'SNAKE';
+      const sp = el.children[1];
+      const curs = el.children[2];
+      let n = sp.textContent.length;
+
+      ctm = setInterval(() => {
+        sp.textContent = txt.slice(0, n += 4);
+        beep(sn ? 520 : 420, .01, 0, 'square', .1);
+        if (n >= txt.length) {
+          clearInterval(ctm);
+          typing = false;
+          sp.textContent = txt;
+          curs.classList.add('cur');
+        }
+      }, 14);
+    }
+    return;
+  }
+  if (++ci >= CD.length) return codecClose();
+  say();
+}
+
+function updateInpUI() {
+  document.querySelectorAll('.mBtn').forEach(b => {
+    const isM = +b.dataset.m === cfg.mode;
+    b.setAttribute('aria-pressed', isM);
+    if (b.dataset.m === '1') {
+      b.innerHTML = isM ? t('mode_1p_on') : t('mode_1p_off');
+    } else {
+      b.innerHTML = isM ? t('mode_2p_on') : t('mode_2p_off');
+    }
+  });
+
+  $('rIn1').className = cfg.mode === 1 ? 'row hide' : 'row';
+  $('rIn2').className = cfg.mode === 1 ? 'row hide' : 'row';
+
+  if (cfg.mode === 2) {
+    document.querySelectorAll('.iBtn').forEach(b => {
+      const p = +b.dataset.p;
+      const i = b.dataset.i;
+      b.setAttribute('aria-pressed', (p === 1 && cfg.p1 === i) || (p === 2 && cfg.p2 === i));
+      b.disabled = state === 'run' || (p === 1 && cfg.p2 === i) || (p === 2 && cfg.p1 === i);
+    });
+  }
+
+  if (net.on) {
+    document.querySelectorAll('.mBtn').forEach(b => {
+      b.disabled = true;
+    });
+    $('rIn1').className = 'row hide';
+    $('rIn2').className = 'row hide';
+  }
+}
+
+document.querySelectorAll('.mBtn').forEach(b => {
+  b.onclick = () => {
+    cfg.mode = +b.dataset.m;
+    set('idle');
+    reset();
+    updateInpUI();
+  };
+});
+
+document.querySelectorAll('.iBtn').forEach(b => {
+  b.onclick = () => {
+    const p = +b.dataset.p;
+    const i = b.dataset.i;
+    if (p === 1) {
+      if (cfg.p2 === i) return;
+      cfg.p1 = i;
+    } else {
+      if (cfg.p1 === i) return;
+      cfg.p2 = i;
+    }
+    updateInpUI();
+  };
+});
+
+addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.target.tagName === 'TEXTAREA') return;
+  const k = e.key.toLowerCase();
+
+  if (codecOpen()) {
+    e.preventDefault();
+    k === 'escape' ? codecClose() : codecTap();
+    return;
+  }
+
+  const dw = KEYS_W[k];
+  const da = KEYS_A[k];
+  let handled = false;
+
+  if (cfg.mode === 1 || net.on) {
+    const d = dw || da;
+    if (d) {
+      e.preventDefault();
+      turn(d, 0);
+      handled = true;
+    }
+  } else {
+    if (dw) {
+      e.preventDefault();
+      handled = true;
+      if (cfg.p1 === 'wasd') turn(dw, 0);
+      if (cfg.p2 === 'wasd') turn(dw, 1);
+    }
+    if (da) {
+      e.preventDefault();
+      handled = true;
+      if (cfg.p1 === 'arrows') turn(da, 0);
+      if (cfg.p2 === 'arrows') turn(da, 1);
+    }
+  }
+
+  if (!handled) {
+    if (k === 'm') {
+      setMute(!mute);
+      if (!mute) beep(880, .06);
+    } else if (k === 't') {
+      applyPalette(palKeys[(palKeys.indexOf(palKey) + 1) % palKeys.length]);
+    } else if (k === 'c') {
+      codecShow();
+    } else if (k === ' ' || k === 'escape' || k === 'p') {
+      e.preventDefault();
+      toggle();
+    } else if (k === 'enter') {
+      e.preventDefault();
+      start();
+    } else if (/^[1-9]$/.test(k) && state !== 'run') {
+      setLevel(+k);
+    }
+  }
+});
+
+document.querySelectorAll('.pad button').forEach(b => {
+  const h = e => {
+    e.preventDefault();
+    if (cfg.mode === 1 || net.on) {
+      turn(b.dataset.d, 0);
+    } else {
+      if (cfg.p1 === 'pad') turn(b.dataset.d, 0);
+      if (cfg.p2 === 'pad') turn(b.dataset.d, 1);
+    }
+  };
+  b.addEventListener('pointerdown', h);
+  b.addEventListener('click', e => {
+    if (e.detail === 0) h(e);
+  });
+});
+
+$('bGo').onclick = toggle;
+
+$('bLang').onclick = () => {
+  lang = availableLangs[(availableLangs.indexOf(lang) + 1) % availableLangs.length];
+  try {
+    localStorage.setItem('snake.lang', lang);
+  } catch (e) {}
+  applyI18n();
+  $('bGo').innerHTML = {
+    idle: t('btn_start'),
+    run: t('btn_pause'),
+    pause: t('btn_resume'),
+    over: t('btn_retry')
+  }[state];
+  updateInpUI();
+  syncCfg();
+  hud();
+  netUI();
+  if (state !== 'run') draw(state === 'over');
+};
+
+$('bMu').onclick = () => {
+  setMute(!mute);
+  if (!mute) beep(880, .06);
+};
+
+$('bRs').onclick = () => {
+  if (confirm(t('confirm_reset'))) {
+    record = 0;
+    maxFood = 0;
+    newRec = false;
+    try {
+      localStorage.removeItem('snake.record');
+      localStorage.removeItem('snake.maxFood');
+    } catch (e) {}
+    hud();
+    if (state === 'over') draw(true);
+  }
+};
+
+$('tt').onclick = codecShow;
+$('codec').onclick = codecTap;
+$('ovl').onclick = () => {
+  if (state === 'over' && overLock) return;
+  start();
+};
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (b) b.blur();
+});
+
+let t0 = null;
+const scr = $('scr');
+
+scr.addEventListener('touchstart', e => {
+  const ev = e.touches[0];
+  t0 = [ev.clientX, ev.clientY];
+}, { passive: true });
+
+scr.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!t0) return;
+  const ev = e.touches[0];
+  const dx = ev.clientX - t0[0];
+  const dy = ev.clientY - t0[1];
+  if (Math.max(Math.abs(dx), Math.abs(dy)) > 24) {
+    const d = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'R' : 'L') : (dy > 0 ? 'D' : 'U');
+    if (cfg.mode === 1 || net.on) {
+      turn(d, 0);
+    } else {
+      if (cfg.p1 === 'touch') turn(d, 0);
+      if (cfg.p2 === 'touch') turn(d, 1);
+    }
+    t0 = [ev.clientX, ev.clientY];
+  }
+}, { passive: false });
+
+scr.addEventListener('touchend', () => {
+  t0 = null;
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && state === 'run') pause();
+});
+
+const lv = $('lv');
+PERIODS.forEach((p, i) => {
+  const b = document.createElement('button');
+  b.className = 'opt';
+  b.textContent = i + 1;
+  b.setAttribute('aria-pressed', i + 1 === cfg.level);
+  b.onclick = () => setLevel(i + 1);
+  lv.append(b);
+});
+
+function setLevel(n) {
+  cfg.level = n;
+  [...lv.children].forEach((b, i) => {
+    b.setAttribute('aria-pressed', i + 1 === n);
+  });
+  hud();
+  netState();
+}
+
+function tg(id, key) {
+  const b = $(id);
+  const r = () => {
+    b.innerHTML = cfg[key] ? t(key + '_on') : t(key + '_off');
+    b.setAttribute('aria-checked', cfg[key]);
+  };
+  b.onclick = () => {
+    cfg[key] = !cfg[key];
+    r();
+    hud();
+    draw(state === 'over');
+    netState();
+  };
+  r();
+}
+
+tg('tW', 'walls');
+tg('tA', 'accel');
+
+const PALETTES = {
+  green: {
+    '--bg': '#050a06',
+    '--fg': '#3dff7a',
+    '--dim': '#1f8a44',
+    '--faint': '#0e3a1d',
+    '--amb': '#ffb000',
+    '--red': '#ff5050',
+    '--bd': '#14532d',
+    '--cbg': '#030704',
+    '--dot': 'rgba(61,255,122,.12)',
+    '--wall-on': '#2fd366',
+    '--wall-off': '#1b6b37',
+    '--head': '#c8ffd8',
+    '--food': '#3dff7a',
+    '--glow': 'rgba(61,255,122,.45)',
+    '--glow2': 'rgba(61,255,122,.14)'
+  },
+  amber: {
+    '--bg': '#0d0701',
+    '--fg': '#ffab1f',
+    '--dim': '#9a6212',
+    '--faint': '#33210b',
+    '--amb': '#ffe08a',
+    '--red': '#ff6a4d',
+    '--bd': '#4a3010',
+    '--cbg': '#090501',
+    '--dot': 'rgba(255,171,31,.12)',
+    '--wall-on': '#d19022',
+    '--wall-off': '#6e4c14',
+    '--head': '#ffe8bd',
+    '--food': '#ffab1f',
+    '--glow': 'rgba(255,171,31,.45)',
+    '--glow2': 'rgba(255,171,31,.14)'
+  },
+  white: {
+    '--bg': '#0e1116',
+    '--fg': '#dfe5ec',
+    '--dim': '#79828e',
+    '--faint': '#262b33',
+    '--amb': '#ffd166',
+    '--red': '#ff7a70',
+    '--bd': '#2c333d',
+    '--cbg': '#0a0d11',
+    '--dot': 'rgba(223,229,236,.10)',
+    '--wall-on': '#8f9aa8',
+    '--wall-off': '#454e59',
+    '--head': '#ffffff',
+    '--food': '#eef3f8',
+    '--glow': 'rgba(223,229,236,.28)',
+    '--glow2': 'rgba(223,229,236,.10)'
+  },
+  cyan: {
+    '--bg': '#031215',
+    '--fg': '#3fd9e8',
+    '--dim': '#1d7f92',
+    '--faint': '#0b333c',
+    '--amb': '#ffc94d',
+    '--red': '#ff6b81',
+    '--bd': '#124a56',
+    '--cbg': '#020d10',
+    '--dot': 'rgba(63,217,232,.12)',
+    '--wall-on': '#2aa9bc',
+    '--wall-off': '#155664',
+    '--head': '#d8f9fd',
+    '--food': '#3fd9e8',
+    '--glow': 'rgba(63,217,232,.42)',
+    '--glow2': 'rgba(63,217,232,.13)'
+  },
+  purple: {
+    '--bg': '#0d0714',
+    '--fg': '#c17bff',
+    '--dim': '#7a4bb0',
+    '--faint': '#2b1644',
+    '--amb': '#ffd166',
+    '--red': '#ff5d86',
+    '--bd': '#3c2160',
+    '--cbg': '#090511',
+    '--dot': 'rgba(193,123,255,.12)',
+    '--wall-on': '#9a5cd8',
+    '--wall-off': '#4b2a78',
+    '--head': '#eedcff',
+    '--food': '#c17bff',
+    '--glow': 'rgba(193,123,255,.42)',
+    '--glow2': 'rgba(193,123,255,.13)'
+  },
+  red: {
+    '--bg': '#120404',
+    '--fg': '#ff5c4d',
+    '--dim': '#a03a2e',
+    '--faint': '#3a120d',
+    '--amb': '#ffc94d',
+    '--red': '#ff9d92',
+    '--bd': '#571c14',
+    '--cbg': '#0d0302',
+    '--dot': 'rgba(255,92,77,.12)',
+    '--wall-on': '#cc4433',
+    '--wall-off': '#6e251b',
+    '--head': '#ffd9d2',
+    '--food': '#ff5c4d',
+    '--glow': 'rgba(255,92,77,.42)',
+    '--glow2': 'rgba(255,92,77,.13)'
+  }
+};
+
+const palKeys = Object.keys(PALETTES);
+const palBtns = [];
+
+palKeys.forEach(k => {
+  const b = document.createElement('button');
+  b.setAttribute('data-i18n', 'pal_' + k);
+  b.innerHTML = t('pal_' + k);
+  b.setAttribute('aria-pressed', 'false');
+  b.onclick = () => applyPalette(k);
+  $('pal').append(b);
+  palBtns.push(b);
+});
+
+let palKey = 'green';
+
+function applyPalette(k) {
+  if (!PALETTES[k]) k = 'green';
+  palKey = k;
+  const st = document.documentElement.style;
+  CURRENT_PALETTE = { ...PALETTES[k] };
+
+  if (isHDR) {
+    const P3_AMB = 'color(display-p3 1 0.70 0.02)';
+    const P3_RED = 'color(display-p3 1 0.14 0.10)';
+    const P3 = {
+      green: { h: 'color(display-p3 0.9 1 0.95)', f: 'color(display-p3 0.1 1 0.4)', g: 'color(display-p3 0.1 1 0.4 / 0.5)', a: P3_AMB },
+      amber: { h: 'color(display-p3 1 0.95 0.85)', f: 'color(display-p3 1 0.65 0)', g: 'color(display-p3 1 0.65 0 / 0.5)', a: 'color(display-p3 1 0.86 0.45)' },
+      white: { h: 'color(display-p3 1 1 1)', f: 'color(display-p3 0.85 0.85 0.95)', g: 'color(display-p3 0.9 0.9 1 / 0.5)', a: P3_AMB },
+      cyan: { h: 'color(display-p3 0.85 1 1)', f: 'color(display-p3 0 0.9 1)', g: 'color(display-p3 0 0.9 1 / 0.5)', a: P3_AMB },
+      purple: { h: 'color(display-p3 0.95 0.85 1)', f: 'color(display-p3 0.7 0.2 1)', g: 'color(display-p3 0.7 0.2 1 / 0.5)', a: P3_AMB },
+      red: { h: 'color(display-p3 1 0.85 0.85)', f: 'color(display-p3 1 0.1 0.1)', g: 'color(display-p3 1 0.1 0.1 / 0.5)', a: P3_AMB }
+    };
+    CURRENT_PALETTE['--head'] = P3[k].h;
+    CURRENT_PALETTE['--fg'] = P3[k].f;
+    CURRENT_PALETTE['--food'] = P3[k].f;
+    CURRENT_PALETTE['--glow'] = P3[k].g;
+    CURRENT_PALETTE['--red'] = P3_RED;
+    CURRENT_PALETTE['--amb'] = P3[k].a;
+  }
+
+  for (const p in CURRENT_PALETTE) {
+    st.setProperty(p, CURRENT_PALETTE[p]);
+  }
+  palBtns.forEach((b, i) => {
+    b.setAttribute('aria-pressed', palKeys[i] === k);
+  });
+  try {
+    localStorage.setItem('snake.pal', k);
+  } catch (e) {}
+  if (players.length > 0) draw(state === 'over');
+}
+
+let savedPal = 'green';
+try {
+  savedPal = localStorage.getItem('snake.pal') || 'green';
+} catch (e) {}
+applyPalette(savedPal);
+
+const HDR_SHADER = `
+struct U { peak: f32, linear: f32, knee: f32, pad0: f32 };
+@group(0) @binding(0) var smp: sampler;
+@group(0) @binding(1) var tex: texture_2d<f32>;
+@group(0) @binding(2) var<uniform> u: U;
+struct VO { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
+@vertex fn vs(@builtin(vertex_index) i: u32) -> VO {
+  var p = array<vec2f, 3>(vec2f(-1.0, -1.0), vec2f(3.0, -1.0), vec2f(-1.0, 3.0));
+  let xy = p[i];
+  var o: VO;
+  o.pos = vec4f(xy, 0.0, 1.0);
+  o.uv = vec2f(xy.x * 0.5 + 0.5, 0.5 - xy.y * 0.5);
+  return o;
+}
+fn dec(c: vec3f) -> vec3f {
+  let lo = c / 12.92;
+  let hi = pow((c + vec3f(0.055)) / 1.055, vec3f(2.4));
+  return select(hi, lo, c <= vec3f(0.04045));
+}
+fn enc(c: vec3f) -> vec3f {
+  let a = abs(c);
+  let lo = a * 12.92;
+  let hi = 1.055 * pow(a, vec3f(1.0 / 2.4)) - vec3f(0.055);
+  return sign(c) * select(hi, lo, a <= vec3f(0.0031308));
+}
+@fragment fn fs(in: VO) -> @location(0) vec4f {
+  let s = textureSample(tex, smp, in.uv);
+  let e = max(max(s.r, s.g), s.b);
+  let t = smoothstep(u.knee, 1.0, e);
+  let lin = dec(s.rgb) * (1.0 + (u.peak - 1.0) * t);
+  var o = lin;
+  if (u.linear < 0.5) { o = enc(lin); }
+  return vec4f(o, 1.0);
+}`;
+
+async function initHDR() {
+  if (!isHDR) return;
+  if (!navigator.gpu) {
+    console.info('WebGPU not available');
+    return;
+  }
+
+  try {
+    const ad = await navigator.gpu.requestAdapter();
+    if (!ad) throw new Error('No adapter found');
+    const dev = await ad.requestDevice();
+    const cv = document.createElement('canvas');
+    cv.id = 'cg';
+    cv.setAttribute('aria-hidden', 'true');
+
+    const cx = cv.getContext('webgpu');
+    if (!cx) throw new Error('WebGPU context is null');
+
+    const base = {
+      device: dev,
+      format: 'rgba16float',
+      toneMapping: { mode: 'extended' },
+      alphaMode: 'opaque'
+    };
+
+    let linear = true;
+    try {
+      cx.configure({ ...base, colorSpace: 'display-p3-linear' });
+    } catch (e) {
+      linear = false;
+      cx.configure({ ...base, colorSpace: 'display-p3' });
+    }
+
+    const gc = cx.getConfiguration ? cx.getConfiguration() : null;
+    if (gc && (!gc.toneMapping || gc.toneMapping.mode !== 'extended')) {
+      throw new Error('Extended tone mapping not supported');
+    }
+
+    const tex = dev.createTexture({
+      size: [W * DPR, H * DPR],
+      format: 'rgba8unorm',
+      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
+    });
+    const smp = dev.createSampler({ magFilter: 'linear', minFilter: 'linear' });
+    const ubuf = dev.createBuffer({
+      size: 16,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+    });
+    const mod = dev.createShaderModule({ code: HDR_SHADER });
+    const pipe = dev.createRenderPipeline({
+      layout: 'auto',
+      vertex: { module: mod, entryPoint: 'vs' },
+      fragment: { module: mod, entryPoint: 'fs', targets: [{ format: 'rgba16float' }] },
+      primitive: { topology: 'triangle-list' }
+    });
+    const bg = dev.createBindGroup({
+      layout: pipe.getBindGroupLayout(0),
+      entries: [
+        { binding: 0, resource: smp },
+        { binding: 1, resource: tex.createView() },
+        { binding: 2, resource: { buffer: ubuf } }
+      ]
+    });
+
+    Object.assign(hdrGPU, { dev, cx, cv, tex, ubuf, pipe, bg, linear });
+    dev.lost.then(() => hdrOff('Device lost'));
+
+    $('c').classList.add('hdr-src');
+    $('c').after(cv);
+    new ResizeObserver(() => hdrPresent()).observe($('scr'));
+    buildHdrUI();
+    hdrGPU.on = true;
+    hdrPresent();
+    console.info('WebGPU extended active (' + (linear ? 'display-p3-linear' : 'display-p3 encoded') + '), peak x' + hdrGPU.peak);
+  } catch (e) {
+    console.info('WebGPU extended inactive:', (e && e.message) || e);
+    hdrOff();
+  }
+}
+
+function hdrOff(why) {
+  hdrGPU.on = false;
+  if (hdrGPU.cv) hdrGPU.cv.remove();
+  $('c').classList.remove('hdr-src');
+  $('rHdr').classList.add('hide');
+  if (why) console.info('[HDR] disabled:', why);
+}
+
+function hdrPresent() {
+  const G = hdrGPU;
+  if (!G.on) return;
+  try {
+    const d = window.devicePixelRatio || 1;
+    const r = G.cv.getBoundingClientRect();
+    const w = Math.max(2, Math.round(r.width * d));
+    const h = Math.max(2, Math.round(r.height * d));
+    if (G.cv.width !== w || G.cv.height !== h) {
+      G.cv.width = w;
+      G.cv.height = h;
+    }
+
+    G.dev.queue.writeBuffer(G.ubuf, 0, new Float32Array([G.peak, G.linear ? 1 : 0, 0.92, 0]));
+    G.dev.queue.copyExternalImageToTexture(
+      { source: $('c') },
+      { texture: G.tex, colorSpace: 'display-p3' },
+      [W * DPR, H * DPR]
+    );
+
+    const en = G.dev.createCommandEncoder();
+    const ps = en.beginRenderPass({
+      colorAttachments: [
+        {
+          view: G.cx.getCurrentTexture().createView(),
+          loadOp: 'clear',
+          storeOp: 'store',
+          clearValue: { r: 0, g: 0, b: 0, a: 1 }
+        }
+      ]
+    });
+    ps.setPipeline(G.pipe);
+    ps.setBindGroup(0, G.bg);
+    ps.draw(3);
+    ps.end();
+    G.dev.queue.submit([en.finish()]);
+  } catch (e) {
+    hdrOff((e && e.message) || 'error');
+  }
+}
+
+function buildHdrUI() {
+  const box = $('hdrSel');
+  box.textContent = '';
+  [[1, 'sdr'], [2, '×2'], [3, '×3'], [4, '×4'], [6, '×6'], [8, '×8']].forEach(([v, l]) => {
+    const b = document.createElement('button');
+    b.textContent = l;
+    b.setAttribute('aria-pressed', v === hdrGPU.peak);
+    b.onclick = () => {
+      hdrGPU.peak = v;
+      try {
+        localStorage.setItem('snake.hdrpeak', v);
+      } catch (e) {}
+      [...box.children].forEach(x => {
+        x.setAttribute('aria-pressed', x === b);
+      });
+      hdrPresent();
+    };
+    box.append(b);
+  });
+  $('hdrNote').textContent = t('hdr_note');
+  $('rHdr').classList.remove('hide');
+}
+
+$('bDl').onclick = () => Object.assign(document.createElement('a'), { href: 'snake.html', download: 'snake.html' }).click();
+
+// ===== LAN play: WebRTC =====
+const net = {
+  on: false,
+  role: null,
+  pc: null,
+  ctl: null,
+  fast: null,
+  g: 0,
+  k: 0,
+  nt: 0,
+  lg: null,
+  lk: 0,
+  seq: 0,
+  inp: [],
+  rs: 0,
+  rtt: null,
+  pm: 1,
+  pi: 0
+};
+
+const isCli = () => net.on && net.role === 'client';
+const DK = ['U', 'D', 'L', 'R'];
+let evm = 0;
+
+['eat:1', 'die:2', 'bonus:4', 'alert:8'].forEach(x => {
+  const [n, b] = x.split(':');
+  const o = sfx[n];
+  sfx['_' + n] = o;
+  sfx[n] = () => {
+    if (!isCli()) evm |= +b;
+    o();
+  };
+});
+
+const lanSt = txt => {
+  $('lanSt').innerHTML = txt;
+};
+
+const netCtl = m => {
+  const c = net.ctl;
+  if (c && c.readyState === 'open') {
+    c.send(JSON.stringify(m));
+  }
+};
+
+const okIp = ip => {
+  const m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(ip);
+  if (!m) return false;
+  const a = m.slice(1).map(Number);
+  if (a.some(n => n > 255)) return false;
+  return (
+    a[0] === 10 ||
+    a[0] === 127 ||
+    (a[0] === 172 && a[1] >= 16 && a[1] <= 31) ||
+    (a[0] === 192 && a[1] === 168)
+  );
+};
+
+const okAddr = a => okIp(a) || /^[0-9a-f-]{36}\.local$/i.test(a);
+
+function enc(sdp) {
+  const g = r => (sdp.match(r) || [])[1];
+  const u = g(/a=ice-ufrag:(\S+)/);
+  const p = g(/a=ice-pwd:(\S+)/);
+  const f = g(/a=fingerprint:sha-256 (\S+)/);
+  const mid = g(/a=mid:(\S+)/);
+  const cs = [...sdp.matchAll(/a=candidate:\S+ 1 udp \d+ (\S+) (\d+) typ host\b/gi)]
+    .filter(m => okAddr(m[1]))
+    .map(m => m[1] + ':' + m[2]);
+
+  if (!u || !p || !f || !mid || !cs.length) {
+    throw new Error('No valid local address found');
+  }
+  return btoa([u, p, f.replace(/:/g, ''), cs.join(','), mid].join('|'));
+}
+
+function dec(code, type) {
+  let u, p, f, c, mid;
+  try {
+    [u, p, f, c, mid] = atob(code.replace(/\s+/g, '')).split('|');
+  } catch (e) {
+    throw new Error('Invalid code');
+  }
+
+  const cs = (c || '').split(',').filter(a => {
+    const i = a.lastIndexOf(':');
+    const pt = +a.slice(i + 1);
+    return i > 0 && okAddr(a.slice(0, i)) && pt > 0 && pt < 65536;
+  });
+
+  if (
+    !/^[\w+\/]{2,256}$/.test(u || '') ||
+    !/^[\w+\/]{8,256}$/.test(p || '') ||
+    !/^[0-9a-f]{64}$/i.test(f || '') ||
+    !/^[\w-]{1,32}$/.test(mid || '') ||
+    !cs.length
+  ) {
+    throw new Error('Invalid code or non-local addresses');
+  }
+
+  return [
+    'v=0',
+    'o=- 1 1 IN IP4 127.0.0.1',
+    's=-',
+    't=0 0',
+    'a=group:BUNDLE ' + mid,
+    'm=application 9 UDP/DTLS/SCTP webrtc-datachannel',
+    'c=IN IP4 0.0.0.0',
+    'a=ice-ufrag:' + u,
+    'a=ice-pwd:' + p,
+    'a=fingerprint:sha-256 ' + f.match(/../g).join(':').toUpperCase(),
+    'a=setup:' + (type === 'offer' ? 'actpass' : 'active'),
+    'a=mid:' + mid,
+    'a=sctp-port:5000',
+    'a=max-message-size:262144',
+    ...cs.map((a, i) => {
+      const k = a.lastIndexOf(':');
+      return 'a=candidate:' + (i + 1) + ' 1 udp ' + (2113937151 - i) + ' ' + a.slice(0, k) + ' ' + a.slice(k + 1) + ' typ host';
+    }),
+    'a=end-of-candidates',
+    ''
+  ].join('\r\n');
+}
+
+const gather = pc => new Promise(r => {
+  const f = () => r(enc(pc.localDescription.sdp));
+  if (pc.iceGatheringState === 'complete') return f();
+  pc.onicegatheringstatechange = () => {
+    if (pc.iceGatheringState === 'complete') f();
+  };
+  setTimeout(f, 2500);
+});
+
+function netSnap(rel) {
+  const ev = evm;
+  evm = 0;
+  if (!net.on || net.role !== 'host') return;
+
+  const ch = rel ? net.ctl : net.fast;
+  if (!ch || ch.readyState !== 'open' || players.length < 2) return;
+
+  const [a, b] = players;
+  const buf = new ArrayBuffer(25 + 2 * (a.snake.length + b.snake.length));
+  const dv = new DataView(buf);
+  let o = 0;
+
+  const w8 = n => dv.setUint8(o++, n);
+  const w16 = n => {
+    dv.setUint16(o, n, true);
+    o += 2;
+  };
+  const w32 = n => {
+    dv.setUint32(o, n, true);
+    o += 4;
+  };
+  const cell = q => q.x + q.y * COLS;
+
+  w8(1);
+  w8(net.g);
+  w16(net.k);
+  w8(ev);
+  w16(eaten);
+  w16(food ? cell(food) : 65535);
+  w16(bonus ? cell(bonus) : 65535);
+  w8(bonus ? bonus.t : 0);
+  w8((a.dead ? 1 : 0) | (b.dead ? 2 : 0));
+  w32(a.score);
+  w32(b.score);
+
+  [a.snake, b.snake].forEach(sn => {
+    w16(sn.length);
+    sn.forEach(q => w16(cell(q)));
+  });
+
+  ch.send(buf);
+}
+
+function netApply(buf) {
+  const v = new DataView(buf);
+  let o = 1;
+
+  const u8 = () => v.getUint8(o++);
+  const u16 = () => {
+    const r = v.getUint16(o, true);
+    o += 2;
+    return r;
+  };
+  const u32 = () => {
+    const r = v.getUint32(o, true);
+    o += 4;
+    return r;
+  };
+
+  const g = u8();
+  const k = u16();
+  if (net.lg !== null) {
+    const dg = (g - net.lg) << 24 >> 24;
+    const dk = (k - net.lk) << 16 >> 16;
+    if (dg < 0 || (dg === 0 && dk < 0)) return;
+  }
+  net.lg = g;
+  net.lk = k;
+
+  const ev = u8();
+  eaten = u16();
+  const fi = u16();
+  const bi = u16();
+  const bt = u8();
+  const dd = u8();
+  const sc = [u32(), u32()];
+  const xy = c => ({ x: c % COLS, y: (c / COLS) | 0 });
+
+  food = fi === 65535 ? null : xy(fi);
+  bonus = bi === 65535 ? null : { ...xy(bi), t: bt };
+
+  players.forEach((p, i) => {
+    const n = u16();
+    p.snake = [];
+    for (let j = 0; j < n; j++) {
+      p.snake.push(xy(u16()));
+    }
+    p.dead = !!(dd & (1 << i));
+    p.score = sc[i];
+    if (p.score > record) {
+      record = p.score;
+      newRec = true;
+    }
+  });
+
+  if (ev & 1) sfx._eat();
+  if (ev & 2) sfx._die();
+  if (ev & 4) sfx._bonus();
+  if (ev & 8) sfx._alert();
+
+  hud();
+  draw(state === 'over');
+}
+
+function netState() {
+  if (!net.on || net.role !== 'host' || !net.ctl || net.ctl.readyState !== 'open') return;
+  netSnap(true);
+  netCtl({
+    t: 'st',
+    s: state,
+    c: { level: cfg.level, walls: cfg.walls, accel: cfg.accel },
+    w: won,
+    d: deathOrder
+  });
+}
+
+function syncCfg() {
+  setLevel(cfg.level);
+  $('tW').innerHTML = cfg.walls ? t('walls_on') : t('walls_off');
+  $('tA').innerHTML = cfg.accel ? t('accel_on') : t('accel_off');
+}
+
+function onCtl(e) {
+  if (typeof e.data !== 'string') {
+    return net.role === 'client' && netApply(e.data);
+  }
+  let m;
+  try {
+    m = JSON.parse(e.data);
+  } catch (x) {
+    return;
+  }
+
+  if (m.t === 'p') {
+    netCtl({ t: 'q', n: m.n });
+  } else if (m.t === 'q') {
+    net.rtt = Math.round(performance.now() - m.n);
+    netUI();
+  } else if (m.t === 'req' && net.role === 'host') {
+    if (m.a === 'pause') {
+      if (state === 'run') pause();
+    } else {
+      start();
+    }
+  } else if (m.t === 'st' && net.role === 'client') {
+    Object.assign(cfg, m.c);
+    won = !!m.w;
+    deathOrder = m.d || [];
+    syncCfg();
+    if (m.s === 'over') {
+      over();
+    } else {
+      set(m.s);
+      hud();
+      draw();
+    }
+  }
+}
+
+function onFast(e) {
+  const v = new Uint8Array(e.data);
+  if (v[0] === 1 && net.role === 'client') {
+    netApply(e.data);
+  } else if (v[0] === 2 && net.role === 'host') {
+    for (let i = 1; i + 1 < v.length; i += 2) {
+      const df = (v[i] - net.rs) & 255;
+      if (df > 0 && df < 128) {
+        net.rs = v[i];
+        turnP(DK[v[i + 1]], 1);
+      }
+    }
+  }
+}
+
+function turn(d, i) {
+  if (!net.on) return turnP(d, i);
+  if (net.role === 'host') return turnP(d, 0);
+  if (state !== 'run') return netCtl({ t: 'req', a: 'start' });
+
+  net.seq = (net.seq + 1) & 255;
+  net.inp.push([net.seq, DK.indexOf(d)]);
+  if (net.inp.length > 4) net.inp.shift();
+  sendIn();
+  setTimeout(sendIn, 10);
+  setTimeout(sendIn, 25);
+}
+
+function sendIn() {
+  const f = net.fast;
+  if (!f || f.readyState !== 'open') return;
+  const a = new Uint8Array(1 + net.inp.length * 2);
+  a[0] = 2;
+  net.inp.forEach(([s, d], i) => {
+    a[1 + i * 2] = s;
+    a[2 + i * 2] = d;
+  });
+  f.send(a);
+}
+
+function netUI() {
+  if (net.on) {
+    const roleHtml = net.role === 'host' ? t('host_p1') : t('guest_p2');
+    lanSt(roleHtml + t('lan_connected') + (net.rtt == null ? '…' : net.rtt + ' ms'));
+  }
+}
+
+function netUp() {
+  net.on = true;
+  sfx.conn();
+  net.pm = cfg.mode;
+  cfg.mode = 2;
+  net.lg = null;
+  net.seq = 0;
+  net.rs = 0;
+  net.inp = [];
+  net.rtt = null;
+
+  clearTimeout(timer);
+  set('idle');
+  reset();
+  $('lanP').classList.add('hide');
+  net.pi = setInterval(() => netCtl({ t: 'p', n: performance.now() }), 1000);
+  netUI();
+  netState();
+}
+
+function netDown(why) {
+  if (!net.pc) return;
+  clearInterval(net.pi);
+  const was = net.on;
+  const pc = net.pc;
+  net.pc = net.ctl = net.fast = null;
+  net.on = false;
+  net.role = null;
+
+  try {
+    pc.close();
+  } catch (e) {}
+
+  if (was) {
+    sfx.lost();
+    cfg.mode = net.pm || 1;
+    clearTimeout(timer);
+    set('idle');
+    reset();
+    updateInpUI();
+  }
+
+  $('lanP').classList.add('hide');
+  $('lX').classList.add('hide');
+  $('lH').classList.remove('hide');
+  $('lJ').classList.remove('hide');
+  lanSt(why || t('lan_disconnected'));
+}
+
+const chk = () => {
+  if (!net.on && net.ctl && net.fast && net.ctl.readyState === 'open' && net.fast.readyState === 'open') {
+    netUp();
+  }
+};
+
+async function netStart(role) {
+  netDown();
+  try {
+    net.role = role;
+    const pc = net.pc = new RTCPeerConnection({ iceServers: [] });
+    net.ctl = pc.createDataChannel('c', { negotiated: true, id: 1 });
+    net.fast = pc.createDataChannel('f', { negotiated: true, id: 2, ordered: false, maxRetransmits: 0 });
+    net.ctl.binaryType = net.fast.binaryType = 'arraybuffer';
+    net.ctl.onmessage = onCtl;
+    net.fast.onmessage = onFast;
+    net.ctl.onopen = net.fast.onopen = chk;
+    net.ctl.onclose = () => {
+      if (net.pc === pc) netDown(t('lan_err_closed'));
+    };
+    pc.onconnectionstatechange = () => {
+      const s = pc.connectionState;
+      if (net.pc === pc && (s === 'failed' || s === 'closed' || (s === 'disconnected' && net.on))) {
+        netDown(t('lan_err_lost'));
+      }
+    };
+
+    $('lOut').value = '';
+    $('lIn').value = '';
+    $('lanP').classList.remove('hide');
+    $('lX').classList.remove('hide');
+    $('lH').classList.add('hide');
+    $('lJ').classList.add('hide');
+
+    if (role === 'host') {
+      await pc.setLocalDescription(await pc.createOffer());
+      $('lOut').value = await gather(pc);
+      lanSt(t('lan_host_step'));
+    } else {
+      lanSt(t('lan_guest_step'));
+    }
+  } catch (e) {
+    lanSt(t('lan_err') + (e.message || e));
+    if (net.pc) netDown(t('lan_err') + (e.message || e));
+  }
+}
+
+$('lH').onclick = () => netStart('host');
+$('lJ').onclick = () => netStart('client');
+$('lX').onclick = () => netDown(t('lan_closed'));
+
+$('lCp').onclick = async () => {
+  const txt = $('lOut').value;
+  if (!txt) return;
+  try {
+    await navigator.clipboard.writeText(txt);
+  } catch (e) {
+    $('lOut').select();
+    document.execCommand('copy');
+  }
+};
+
+$('lGo').onclick = async () => {
+  const pc = net.pc;
+  if (!pc) return;
+  try {
+    const code = $('lIn').value;
+    if (net.role === 'host') {
+      await pc.setRemoteDescription({ type: 'answer', sdp: dec(code, 'answer') });
+      lanSt(t('lan_connecting'));
+    } else {
+      await pc.setRemoteDescription({ type: 'offer', sdp: dec(code, 'offer') });
+      await pc.setLocalDescription(await pc.createAnswer());
+      $('lOut').value = await gather(pc);
+      lanSt(t('lan_host_wait'));
+    }
+  } catch (e) {
+    lanSt(t('lan_err') + (e.message || e));
+  }
+};
+
+set('idle');
+reset();
+setMute(mute);
+updateInpUI();
+initHDR();
+
+document.fonts.ready.then(() => draw());
+
+if (window.parent !== window) {
+  const appDiv = document.getElementById('app');
+  const resizeObs = new ResizeObserver(() => {
+    window.parent.postMessage({ type: 'snake-size', h: appDiv.scrollHeight }, '*');
+  });
+  resizeObs.observe(appDiv);
+}
+</script>
+</body>
+</html>
