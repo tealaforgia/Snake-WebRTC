@@ -661,6 +661,7 @@ textarea {
   }
 }
 
+/* ===== Regole base iframe (Desktop e Mobile) ===== */
 html.is-iframe {
   height: 100%;
   background: var(--cbg) !important;
@@ -696,6 +697,11 @@ html.is-iframe .term {
   flex-direction: column;
   flex-grow: 1;
 }
+
+html.is-iframe.snake-measure body { min-height: 0; }
+html.is-iframe.snake-measure #app,
+html.is-iframe.snake-measure .term,
+html.is-iframe.snake-measure .hint { flex-grow: 0; }
 
 html.is-iframe .hint {
   flex-grow: 1;
@@ -796,6 +802,7 @@ html.is-iframe .hint {
     font-size: 15px;
   }
 }
+
   </style>
 </head>
 <body>
@@ -1061,6 +1068,10 @@ const i18n = {
     lan_err: "error: ",
     lan_err_closed: "connection closed",
     lan_err_lost: "connection lost",
+    lan_err_failed: "connection failed: check that both devices are on the same network",
+    lan_err_timeout: "timeout: connection not established, check that both devices are on the same network",
+    lan_err_timeout_pair: "timeout: pairing not completed, try again",
+    lan_err_unsupported: "WebRTC is not supported by this browser",
     lan_connecting: "connecting…",
     lan_host_step: "1) send your code to the guest  2) paste their answer and press connect",
     lan_guest_step: "paste the host's code and press connect",
@@ -1186,7 +1197,7 @@ const i18n = {
     accel: "$ accel",
     accel_on: "[x] accelerazione",
     accel_off: "[ ] accelerazione",
-    accel_note: "-20 ms ogni 5 prede, minimo 90 ms",
+    accel_note: "-20 ms ogni 5 prede, minimo 80 ms",
     palette: "$ palette",
     palette_note: "cambia tema",
     hdr: "$ hdr",
@@ -1221,6 +1232,10 @@ const i18n = {
     lan_err: "errore: ",
     lan_err_closed: "connessione chiusa",
     lan_err_lost: "connessione persa",
+    lan_err_failed: "connessione fallita: controlla che i due dispositivi siano nella stessa rete",
+    lan_err_timeout: "timeout: connessione non stabilita, controlla che i due dispositivi siano nella stessa rete",
+    lan_err_timeout_pair: "timeout: abbinamento non completato, riprova",
+    lan_err_unsupported: "WebRTC non è supportato da questo browser",
     lan_connecting: "connessione in corso…",
     lan_host_step: "1) manda il tuo codice all'ospite  2) incolla la sua risposta e premi connetti",
     lan_guest_step: "incolla il codice dell'host e premi connetti",
@@ -1410,6 +1425,18 @@ const rnd = n => Math.floor(Math.random() * n);
 const period = () => cfg.accel
   ? Math.max(80, PERIODS[cfg.level - 1] - 20 * Math.floor(eaten / 5))
   : PERIODS[cfg.level - 1];
+
+function speedMult() {
+  const cur = period();
+  let i = 0;
+
+  while (i < PERIODS.length - 2 && cur < PERIODS[i + 1]) i++;
+
+  const a = PERIODS[i];
+  const b = PERIODS[i + 1];
+
+  return i + 1 + (a - cur) / (a - b);
+}
 
 function free() {
   let len = 0;
@@ -1729,6 +1756,7 @@ function tick() {
 
   let fEaten = false;
   let bEaten = false;
+  const mult = speedMult();
 
   players.forEach(p => {
     if (p.dead) return;
@@ -1739,7 +1767,7 @@ function tick() {
     if (!eatF) {
       p.snake.pop();
     } else {
-      p.score += 7 * cfg.level;
+      p.score += Math.round(7 * mult);
       eaten++;
       fEaten = true;
       if (eaten > maxFood) {
@@ -1758,7 +1786,7 @@ function tick() {
     }
 
     if (eatB) {
-      p.score += cfg.level * (10 + bonus.t);
+      p.score += Math.round(mult * (10 + bonus.t));
       bEaten = true;
       bonus = null;
       if (p.score > record) {
@@ -2673,6 +2701,10 @@ function buildHdrUI() {
 $('bDl').onclick = () => Object.assign(document.createElement('a'), { href: 'snake.html', download: 'snake.html' }).click();
 
 // ===== LAN play: WebRTC =====
+const NET_GATHER_MS = 5000;
+const NET_PAIR_MS = 300000;
+const NET_LINK_MS = 20000;
+
 const net = {
   on: false,
   role: null,
@@ -2689,7 +2721,9 @@ const net = {
   rs: 0,
   rtt: null,
   pm: 1,
-  pi: 0
+  pi: 0,
+  to: 0,
+  rd: false
 };
 
 const isCli = () => net.on && net.role === 'client';
@@ -2796,13 +2830,29 @@ function dec(code, type) {
   ].join('\r\n');
 }
 
-const gather = pc => new Promise(r => {
-  const f = () => r(enc(pc.localDescription.sdp));
-  if (pc.iceGatheringState === 'complete') return f();
-  pc.onicegatheringstatechange = () => {
-    if (pc.iceGatheringState === 'complete') f();
+const gather = pc => new Promise((resolve, reject) => {
+  let done = false;
+
+  const finish = () => {
+    if (done) return;
+    done = true;
+    clearTimeout(tm);
+    pc.onicegatheringstatechange = null;
+
+    try {
+      resolve(enc(pc.localDescription.sdp));
+    } catch (e) {
+      reject(e);
+    }
   };
-  setTimeout(f, 2500);
+
+  const tm = setTimeout(finish, NET_GATHER_MS);
+
+  if (pc.iceGatheringState === 'complete') return finish();
+
+  pc.onicegatheringstatechange = () => {
+    if (pc.iceGatheringState === 'complete') finish();
+  };
 });
 
 function netSnap(rel) {
@@ -3013,6 +3063,7 @@ function netUI() {
 }
 
 function netUp() {
+  clearTimeout(net.to);
   net.on = true;
   sfx.conn();
   net.pm = cfg.mode;
@@ -3032,14 +3083,25 @@ function netUp() {
   netState();
 }
 
+function netWatch(ms, why) {
+  clearTimeout(net.to);
+  const pc = net.pc;
+
+  net.to = setTimeout(() => {
+    if (net.pc === pc && !net.on) netDown(t(why));
+  }, ms);
+}
+
 function netDown(why) {
   if (!net.pc) return;
   clearInterval(net.pi);
+  clearTimeout(net.to);
   const was = net.on;
   const pc = net.pc;
   net.pc = net.ctl = net.fast = null;
   net.on = false;
   net.role = null;
+  net.rd = false;
 
   try {
     pc.close();
@@ -3069,8 +3131,15 @@ const chk = () => {
 
 async function netStart(role) {
   netDown();
+
+  if (typeof RTCPeerConnection === 'undefined') {
+    lanSt(t('lan_err_unsupported'));
+    return;
+  }
+
   try {
     net.role = role;
+    net.rd = false;
     const pc = net.pc = new RTCPeerConnection({ iceServers: [] });
     net.ctl = pc.createDataChannel('c', { negotiated: true, id: 1 });
     net.fast = pc.createDataChannel('f', { negotiated: true, id: 2, ordered: false, maxRetransmits: 0 });
@@ -3082,8 +3151,12 @@ async function netStart(role) {
       if (net.pc === pc) netDown(t('lan_err_closed'));
     };
     pc.onconnectionstatechange = () => {
+      if (net.pc !== pc) return;
       const s = pc.connectionState;
-      if (net.pc === pc && (s === 'failed' || s === 'closed' || (s === 'disconnected' && net.on))) {
+
+      if (s === 'failed') {
+        netDown(net.on ? t('lan_err_lost') : t('lan_err_failed'));
+      } else if (s === 'closed' || (s === 'disconnected' && net.on)) {
         netDown(t('lan_err_lost'));
       }
     };
@@ -3094,17 +3167,27 @@ async function netStart(role) {
     $('lX').classList.remove('hide');
     $('lH').classList.add('hide');
     $('lJ').classList.add('hide');
+    netWatch(NET_PAIR_MS, 'lan_err_timeout_pair');
 
     if (role === 'host') {
       await pc.setLocalDescription(await pc.createOffer());
-      $('lOut').value = await gather(pc);
+      const code = await gather(pc);
+      if (net.pc !== pc) return;
+
+      $('lOut').value = code;
       lanSt(t('lan_host_step'));
+      netWatch(NET_PAIR_MS, 'lan_err_timeout_pair');
     } else {
       lanSt(t('lan_guest_step'));
     }
   } catch (e) {
-    lanSt(t('lan_err') + (e.message || e));
-    if (net.pc) netDown(t('lan_err') + (e.message || e));
+    const msg = t('lan_err') + (e.message || e);
+
+    if (net.pc) {
+      netDown(msg);
+    } else {
+      lanSt(msg);
+    }
   }
 }
 
@@ -3125,20 +3208,37 @@ $('lCp').onclick = async () => {
 
 $('lGo').onclick = async () => {
   const pc = net.pc;
-  if (!pc) return;
+  if (!pc || net.rd) return;
+
+  let sdp;
   try {
-    const code = $('lIn').value;
-    if (net.role === 'host') {
-      await pc.setRemoteDescription({ type: 'answer', sdp: dec(code, 'answer') });
-      lanSt(t('lan_connecting'));
-    } else {
-      await pc.setRemoteDescription({ type: 'offer', sdp: dec(code, 'offer') });
-      await pc.setLocalDescription(await pc.createAnswer());
-      $('lOut').value = await gather(pc);
-      lanSt(t('lan_host_wait'));
-    }
+    sdp = dec($('lIn').value, net.role === 'host' ? 'answer' : 'offer');
   } catch (e) {
     lanSt(t('lan_err') + (e.message || e));
+    return;
+  }
+
+  net.rd = true;
+
+  try {
+    if (net.role === 'host') {
+      await pc.setRemoteDescription({ type: 'answer', sdp });
+      if (net.pc !== pc) return;
+
+      lanSt(t('lan_connecting'));
+      netWatch(NET_LINK_MS, 'lan_err_timeout');
+    } else {
+      await pc.setRemoteDescription({ type: 'offer', sdp });
+      await pc.setLocalDescription(await pc.createAnswer());
+      const code = await gather(pc);
+      if (net.pc !== pc) return;
+
+      $('lOut').value = code;
+      lanSt(t('lan_host_wait'));
+      netWatch(NET_PAIR_MS, 'lan_err_timeout_pair');
+    }
+  } catch (e) {
+    if (net.pc === pc) netDown(t('lan_err') + (e.message || e));
   }
 };
 
@@ -3151,11 +3251,26 @@ initHDR();
 document.fonts.ready.then(() => draw());
 
 if (window.parent !== window) {
+  const root = document.documentElement;
   const appDiv = document.getElementById('app');
-  const resizeObs = new ResizeObserver(() => {
-    window.parent.postMessage({ type: 'snake-size', h: appDiv.scrollHeight }, '*');
-  });
+  const term = appDiv.querySelector('.term');
+  let lastH = 0;
+  function naturalHeight() {
+    root.classList.add('snake-measure');
+    const h = Math.ceil(appDiv.getBoundingClientRect().height);
+    root.classList.remove('snake-measure');
+    return h;
+  }
+  function postSize() {
+    const h = naturalHeight();
+    if (h === lastH) return;
+    lastH = h;
+    window.parent.postMessage({ type: 'snake-size', h: h }, '*');
+  }
+  const resizeObs = new ResizeObserver(postSize);
   resizeObs.observe(appDiv);
+  Array.from(term.children).forEach(el => resizeObs.observe(el));
+  window.addEventListener('resize', postSize);
 }
 </script>
 </body>
