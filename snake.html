@@ -111,7 +111,7 @@ body {
   inset: 0;
   pointer-events: none;
   background-image:
-    repeating-linear-gradient(0deg, rgba(0, 0, 0, .2) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, .2) 0 1px, transparent 1px 3px),
     radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, .6)),
     url('data:image/svg+xml;utf8,<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"><filter id="n1"><feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n1)" opacity="0.03"/></svg>');
   background-size: auto, auto, 128px 128px;
@@ -176,6 +176,19 @@ body {
   .fx i {
     animation: none;
   }
+}
+
+html.perf .fx::before,
+html.perf .fx i {
+  animation: none;
+}
+
+html.perf canvas {
+  filter: none;
+}
+
+html.perf .codec {
+  backdrop-filter: none;
 }
 
 .bar {
@@ -310,7 +323,7 @@ canvas {
   display: block;
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 0 calc(2px * var(--bloom)) var(--glow2));
+  filter: drop-shadow(0 0 calc(2px * var(--bloom) * var(--cs, 1)) var(--glow2));
 }
 
 #cg {
@@ -341,7 +354,7 @@ canvas.hdr-src {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  align-items: center;
+  align-items: start;
   justify-content: space-between;
   padding: 14px 12px;
 }
@@ -661,7 +674,7 @@ textarea {
   }
 }
 
-/* ===== Regole base iframe (Desktop e Mobile) ===== */
+/* ===== Regole iframe ===== */
 html.is-iframe {
   height: 100%;
   background: var(--cbg) !important;
@@ -803,6 +816,192 @@ html.is-iframe .hint {
   }
 }
 
+
+.stage {
+  display: contents;
+}
+
+html.fs,
+html.fs body {
+  overflow: hidden;
+}
+
+html.fs body {
+  padding: 0;
+}
+
+html.fs .fx {
+  display: none;
+}
+
+html.fs .bar {
+  padding: 3px 10px;
+}
+
+html.fs .hud {
+  padding: 3px 12px 2px;
+  line-height: 1.1;
+}
+
+html.fs #bn {
+  min-height: 1.1em;
+}
+
+html.fs .term {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  max-width: none;
+  border: none;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding:
+    env(safe-area-inset-top, 0px)
+    env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px)
+    env(safe-area-inset-left, 0px);
+}
+
+html.fs .opts,
+html.fs .dash,
+html.fs .hint,
+html.fs #bMu,
+html.fs #bRs,
+html.fs #bDl {
+  display: none;
+}
+
+html.fs .stage {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+html.fs .screen {
+  flex: 0 1 auto;
+  min-height: 0;
+  min-width: 0;
+  width: auto;
+  height: auto;
+  max-width: calc(100% - 24px);
+  max-height: 100%;
+  aspect-ratio: 1.5;
+  margin: auto;
+  border: 0;
+}
+
+html.fs canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (min-aspect-ratio: 4/3) {
+  html.fs {
+    --fs-side: clamp(180px, 18vw, 200px);
+    --fs-gap: 12px;
+  }
+
+  html.fs .bar {
+    padding: 3px 12px;
+  }
+
+  html.fs .hud {
+    padding: 3px 12px 0 12px;
+  }
+
+  html.fs #bn {
+    display: block;
+    margin-bottom: 4px;
+    margin-right: calc(var(--fs-side) + 8px);
+  }
+
+  html.fs .stage {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+    align-items: center;
+    padding: 0 calc(var(--fs-side) + 20px) 8px 12px;
+    container-type: size;
+  }
+
+  html.fs .ctl {
+    position: absolute;
+    right: calc(env(safe-area-inset-right, 0px) + 12px);
+    top: calc(env(safe-area-inset-top, 0px) + 40px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    width: var(--fs-side);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 0;
+    gap: 8px;
+    z-index: 10;
+    flex-wrap: nowrap;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+  }
+
+  html.fs .ctl::-webkit-scrollbar {
+    display: none;
+  }
+
+  html.fs .screen {
+    flex: none;
+    --fs-w: min(100cqw, calc(100cqh * 1.5));
+    width: var(--fs-w);
+    margin: 0 auto;
+    border: 0;
+  }
+
+  html.fs .pad {
+    flex: none;
+    width: 100%;
+    margin: auto 0;
+  }
+
+  html.fs .act {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    gap: 6px;
+  }
+
+  html.fs canvas {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    aspect-ratio: auto;
+  }
+
+  html.fs .codec {
+    gap: clamp(8px, calc(var(--fs-w) * 0.02), 16px);
+    padding: clamp(12px, calc(var(--fs-w) * 0.03), 24px);
+    font-size: clamp(14px, calc(var(--fs-w) * 0.035), 26px);
+  }
+
+  html.fs .cf {
+    gap: clamp(6px, calc(var(--fs-w) * 0.02), 16px);
+    margin-top: clamp(8px, calc(var(--fs-w) * 0.025), 20px);
+  }
+
+  html.fs .cp pre {
+    margin-bottom: clamp(4px, calc(var(--fs-w) * 0.015), 10px);
+    font-size: clamp(10px, calc(var(--fs-w) * 0.028), 20px);
+  }
+
+  html.fs .ct {
+    padding: clamp(10px, calc(var(--fs-w) * 0.03), 20px);
+    min-height: 4.2em;
+  }
+}
   </style>
 </head>
 <body>
@@ -822,7 +1021,7 @@ html.is-iframe .hint {
       <i class="btn-g"></i>
       <span id="tt">
         <span class="am">tealaforgia@retro</span><span style="color:var(--dim)">:~$</span>
-        <span style="color:var(--head)">./snake --webrtc</span><span class="cur">█</span>
+        <span style="color:var(--head)">./snake <span style="white-space:nowrap">--webrtc</span></span><span class="cur">█</span>
       </span>
     </div>
 
@@ -843,46 +1042,49 @@ html.is-iframe .hint {
       <span id="bn"></span>
     </div>
 
-    <div class="screen" id="scr">
-      <canvas id="c" width="576" height="384"></canvas>
-      <div class="ovl" id="ovl"></div>
-      <div class="codec hide" id="codec">
-        <div class="cf">
-          <div class="cp">
-            <pre> .-^^-.
+    <div class="stage">
+      <div class="screen" id="scr">
+        <canvas id="c" width="576" height="384"></canvas>
+        <div class="ovl" id="ovl"></div>
+        <div class="codec hide" id="codec">
+          <div class="cf">
+            <div class="cp">
+              <pre> .-^^-.
  |====|
  |o  o|
  | -- |
   '--'</pre>
-            <b data-i18n="msg_idle">SNAKE</b>
-          </div>
-          <div class="cm">140.85<small data-i18n="codec_small">codec</small></div>
-          <div class="cp">
-            <pre id="codec-p2-img"> .----.
+              <b data-i18n="msg_idle">SNAKE</b>
+            </div>
+            <div class="cm">140.85<small data-i18n="codec_small">codec</small></div>
+            <div class="cp">
+              <pre id="codec-p2-img"> .----.
  |____|
  |(oo)|
  | ^^ |
   \__/ </pre>
-            <b id="codec-p2-name">MAJOR ZERO</b>
+              <b id="codec-p2-name">MAJOR ZERO</b>
+            </div>
           </div>
+          <div class="ct" id="ct"></div>
+          <div class="cx" data-i18n="touch_prompt">[ touch or press a key ]</div>
         </div>
-        <div class="ct" id="ct"></div>
-        <div class="cx" data-i18n="touch_prompt">[ touch or press a key ]</div>
       </div>
-    </div>
 
-    <div class="ctl">
-      <div class="pad">
-        <button data-d="U" style="grid-area:u" aria-label="su" data-i18n-aria="aria_up">▲</button>
-        <button data-d="L" style="grid-area:l" aria-label="sinistra" data-i18n-aria="aria_left">◀</button>
-        <button data-d="D" style="grid-area:d" aria-label="giù" data-i18n-aria="aria_down">▼</button>
-        <button data-d="R" style="grid-area:r" aria-label="destra" data-i18n-aria="aria_right">▶</button>
-      </div>
-      <div class="act">
-        <button id="bGo" data-i18n="btn_start">▶ start</button>
-        <button id="bMu" data-i18n="btn_sound_on">♪ sound: on</button>
-        <button id="bRs" data-i18n="btn_reset">⟲ reset stats</button>
-        <button id="bDl" data-i18n="btn_dl">↓ download snake.html</button>
+      <div class="ctl">
+        <div class="pad">
+          <button data-d="U" style="grid-area:u" aria-label="su" data-i18n-aria="aria_up">▲</button>
+          <button data-d="L" style="grid-area:l" aria-label="sinistra" data-i18n-aria="aria_left">◀</button>
+          <button data-d="D" style="grid-area:d" aria-label="giù" data-i18n-aria="aria_down">▼</button>
+          <button data-d="R" style="grid-area:r" aria-label="destra" data-i18n-aria="aria_right">▶</button>
+        </div>
+        <div class="act">
+          <button id="bGo" data-i18n="btn_start">▶ start</button>
+          <button id="bFs" data-i18n="btn_fs">▣ fullscreen</button>
+          <button id="bMu" data-i18n="btn_sound_on">♪ sound: on</button>
+          <button id="bRs" data-i18n="btn_reset">⟲ reset stats</button>
+          <button id="bDl" data-i18n="btn_dl">↓ download snake.html</button>
+        </div>
       </div>
     </div>
 
@@ -967,6 +1169,12 @@ html.is-iframe .hint {
       </div>
 
       <div class="row">
+        <b data-i18n="perf">$ perf</b>
+        <button class="tg opt" id="tP" role="switch" data-i18n="perf_off">[ ] boost performance</button>
+        <span class="note" data-i18n="perf_note">disables WebGPU HDR, glow and background animations</span>
+      </div>
+
+      <div class="row">
         <b data-i18n="lang_lbl">$ language</b>
         <button class="tg" id="bLang"></button>
       </div>
@@ -1005,6 +1213,8 @@ const i18n = {
     btn_sound_off: "♪ sound: off",
     btn_reset: "⟲ reset stats",
     btn_dl: "↓ download snake.html",
+    btn_fs: "▣ fullscreen",
+    btn_fs_off: "▢ exit",
     mode: "$ mode",
     mode_1p_on: "[x] 1 Player",
     mode_1p_off: "[ ] 1 Player",
@@ -1041,6 +1251,10 @@ const i18n = {
     palette_note: "change theme",
     hdr: "$ hdr",
     hdr_note: "adjust max HDR brightness",
+    perf: "$ perf",
+    perf_on: "[x] boost performance",
+    perf_off: "[ ] boost performance",
+    perf_note: "disables WebGPU HDR, glow and background animations",
     hint_kbd: "<span style=\"white-space:nowrap\">↑↓←→ / WASD / swipe move</span> · <span style=\"white-space:nowrap\">space pause</span> · <span style=\"white-space:nowrap\">enter start</span> · <span style=\"white-space:nowrap\">1-9 level</span> · <span style=\"white-space:nowrap\">M sound</span> · <span style=\"white-space:nowrap\">T palette</span>",
     touch_prompt: "[ touch or press a key ]",
     aria_up: "up",
@@ -1171,6 +1385,8 @@ const i18n = {
     btn_sound_off: "♪ suono: off",
     btn_reset: "⟲ reset statistiche",
     btn_dl: "↓ scarica snake.html",
+    btn_fs: "▣ schermo intero",
+    btn_fs_off: "▢ esci",
     mode: "$ mod",
     mode_1p_on: "[x] 1 Giocatore",
     mode_1p_off: "[ ] 1 Giocatore",
@@ -1207,6 +1423,10 @@ const i18n = {
     palette_note: "cambia tema",
     hdr: "$ hdr",
     hdr_note: "regola la luminosità massima HDR",
+    perf: "$ perf",
+    perf_on: "[x] aumenta prestazioni",
+    perf_off: "[ ] aumenta prestazioni",
+    perf_note: "disattiva WebGPU HDR, bagliore e animazioni di sfondo",
     hint_kbd: "<span style=\"white-space:nowrap\">↑↓←→ / WASD / swipe muovi</span> · <span style=\"white-space:nowrap\">spazio pausa</span> · <span style=\"white-space:nowrap\">invio avvia</span> · <span style=\"white-space:nowrap\">1-9 livello</span> · <span style=\"white-space:nowrap\">M suono</span> · <span style=\"white-space:nowrap\">T palette</span>",
     touch_prompt: "[ tocca o premi un tasto ]",
     aria_up: "su",
@@ -1385,12 +1605,10 @@ const KEYS_A = { arrowup: 'U', arrowdown: 'D', arrowleft: 'L', arrowright: 'R' }
 const cfg = { level: 3, walls: true, accel: false, mode: 1, p1: 'wasd', p2: 'arrows' };
 
 const isHDR = window.matchMedia('(dynamic-range: high)').matches;
-const DPR = window.devicePixelRatio || 1;
 const c_canvas = $('c');
-c_canvas.width = W * DPR;
-c_canvas.height = H * DPR;
 const ctx = c_canvas.getContext('2d', { colorSpace: isHDR ? 'display-p3' : 'srgb' });
-ctx.scale(DPR, DPR);
+let BW = W;
+let BH = H;
 let CURRENT_PALETTE = {};
 
 const BLOOM = (() => {
@@ -1403,6 +1621,16 @@ try {
   const v = parseFloat(localStorage.getItem('snake.hdrpeak'));
   if (v >= 1 && v <= 16) hdrGPU.peak = v;
 } catch (e) {}
+
+const perf = { on: false };
+
+try {
+  perf.on = localStorage.getItem('snake.perf') === '1';
+} catch (e) {}
+
+document.documentElement.classList.toggle('perf', perf.on);
+
+const glow = n => perf.on ? 0 : n * BW / W;
 
 let players = [];
 let food;
@@ -1554,7 +1782,7 @@ function draw(isOver) {
   const g = ctx;
   const P = CURRENT_PALETTE;
 
-  g.filter = state !== 'run' ? 'blur(4px)' : 'none';
+  g.filter = state !== 'run' && !perf.on ? 'blur(' + glow(4) + 'px)' : 'none';
   g.shadowBlur = 0;
   g.fillStyle = P['--cbg'];
   g.fillRect(0, 0, W, H);
@@ -1581,7 +1809,7 @@ function draw(isOver) {
     const bc = idx === 0 ? P['--fg'] : P['--amb'];
 
     g.shadowColor = bc;
-    g.shadowBlur = (isHDR ? 18 : 12) * BLOOM;
+    g.shadowBlur = glow((isHDR ? 18 : 12) * BLOOM);
     p.snake.forEach((pt, i) => {
       g.fillStyle = i === 0 ? hc : bc;
       g.fillRect(pt.x * S + 3, pt.y * S + 3, S - 6, S - 6);
@@ -1683,14 +1911,14 @@ function draw(isOver) {
       g.font = l.f;
       g.fillStyle = l.c;
 
-      if (l.g && l.g !== 'transparent') {
+      if (!perf.on && l.g && l.g !== 'transparent') {
         if (l.g2) {
           g.shadowColor = l.g2;
-          g.shadowBlur = l.b * 2 * BLOOM * (isHDR ? 1.5 : 1);
+          g.shadowBlur = glow(l.b * 2 * BLOOM * (isHDR ? 1.5 : 1));
           g.fillText(l.t, W / 2, currentY + l.h / 2);
         }
         g.shadowColor = l.g;
-        g.shadowBlur = l.b * BLOOM * (isHDR ? 1.5 : 1);
+        g.shadowBlur = glow(l.b * BLOOM * (isHDR ? 1.5 : 1));
         g.fillText(l.t, W / 2, currentY + l.h / 2);
       }
 
@@ -2010,6 +2238,7 @@ let ci = 0;
 let typing = false;
 let ctm;
 let fastFwd = false;
+let activeCD = null;
 const codecOpen = () => !cod.classList.contains('hide');
 
 function getActiveCodecData() {
@@ -2020,7 +2249,7 @@ function getActiveCodecData() {
 }
 
 function say() {
-  const CD = getActiveCodecData();
+  const CD = activeCD;
   const [w, txt] = CD[ci];
   const el = $('ct');
   const sn = w === 'SNAKE';
@@ -2048,6 +2277,7 @@ function codecShow() {
   if (codecOpen()) return;
   if (state === 'run') pause();
   ci = 0;
+  activeCD = getActiveCodecData();
 
   const CD = getActiveCodecData();
   const p2Name = CD.find(line => line[0] !== 'SNAKE')[0] || 'MAJOR ZERO';
@@ -2071,7 +2301,7 @@ function codecClose() {
 }
 
 function codecTap() {
-  const CD = getActiveCodecData();
+  const CD = activeCD;
   if (typing) {
     if (!fastFwd) {
       fastFwd = true;
@@ -2552,7 +2782,7 @@ fn enc(c: vec3f) -> vec3f {
 }`;
 
 async function initHDR() {
-  if (!isHDR) return;
+  if (!isHDR || perf.on) return;
   if (!navigator.gpu) {
     console.info('WebGPU not available');
     return;
@@ -2562,6 +2792,12 @@ async function initHDR() {
     const ad = await navigator.gpu.requestAdapter();
     if (!ad) throw new Error('No adapter found');
     const dev = await ad.requestDevice();
+
+    if (perf.on || hdrGPU.on) {
+      dev.destroy();
+      return;
+    }
+
     const cv = document.createElement('canvas');
     cv.id = 'cg';
     cv.setAttribute('aria-hidden', 'true');
@@ -2589,11 +2825,6 @@ async function initHDR() {
       throw new Error('Extended tone mapping not supported');
     }
 
-    const tex = dev.createTexture({
-      size: [W * DPR, H * DPR],
-      format: 'rgba8unorm',
-      usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
-    });
     const smp = dev.createSampler({ magFilter: 'linear', minFilter: 'linear' });
     const ubuf = dev.createBuffer({
       size: 16,
@@ -2606,21 +2837,17 @@ async function initHDR() {
       fragment: { module: mod, entryPoint: 'fs', targets: [{ format: 'rgba16float' }] },
       primitive: { topology: 'triangle-list' }
     });
-    const bg = dev.createBindGroup({
-      layout: pipe.getBindGroupLayout(0),
-      entries: [
-        { binding: 0, resource: smp },
-        { binding: 1, resource: tex.createView() },
-        { binding: 2, resource: { buffer: ubuf } }
-      ]
-    });
 
-    Object.assign(hdrGPU, { dev, cx, cv, tex, ubuf, pipe, bg, linear });
-    dev.lost.then(() => hdrOff('Device lost'));
+    Object.assign(hdrGPU, { dev, cx, cv, smp, ubuf, pipe, linear, tex: null });
+    hdrTex();
+    dev.lost.then(() => {
+      if (hdrGPU.dev === dev) hdrOff('Device lost');
+    });
 
     $('c').classList.add('hdr-src');
     $('c').after(cv);
-    new ResizeObserver(() => hdrPresent()).observe($('scr'));
+    hdrGPU.ro = new ResizeObserver(() => hdrPresent());
+    hdrGPU.ro.observe($('scr'));
     buildHdrUI();
     hdrGPU.on = true;
     hdrPresent();
@@ -2633,7 +2860,19 @@ async function initHDR() {
 
 function hdrOff(why) {
   hdrGPU.on = false;
+
+  if (hdrGPU.ro) {
+    hdrGPU.ro.disconnect();
+    hdrGPU.ro = null;
+  }
+
   if (hdrGPU.cv) hdrGPU.cv.remove();
+
+  if (hdrGPU.dev) {
+    hdrGPU.dev.destroy();
+    hdrGPU.dev = null;
+  }
+
   $('c').classList.remove('hdr-src');
   $('rHdr').classList.add('hide');
   if (why) console.info('[HDR] disabled:', why);
@@ -2656,7 +2895,7 @@ function hdrPresent() {
     G.dev.queue.copyExternalImageToTexture(
       { source: $('c') },
       { texture: G.tex, colorSpace: 'display-p3' },
-      [W * DPR, H * DPR]
+      [BW, BH]
     );
 
     const en = G.dev.createCommandEncoder();
@@ -2678,6 +2917,48 @@ function hdrPresent() {
   } catch (e) {
     hdrOff((e && e.message) || 'error');
   }
+}
+
+function hdrTex() {
+  const G = hdrGPU;
+
+  if (G.tex) G.tex.destroy();
+
+  G.tex = G.dev.createTexture({
+    size: [BW, BH],
+    format: 'rgba8unorm',
+    usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
+  });
+  G.bg = G.dev.createBindGroup({
+    layout: G.pipe.getBindGroupLayout(0),
+    entries: [
+      { binding: 0, resource: G.smp },
+      { binding: 1, resource: G.tex.createView() },
+      { binding: 2, resource: { buffer: G.ubuf } }
+    ]
+  });
+}
+
+function fitCanvas() {
+  const r = c_canvas.getBoundingClientRect();
+  if (r.width < 2) return;
+
+  c_canvas.style.setProperty('--cs', r.width / W);
+
+  const w = Math.round(r.width * (window.devicePixelRatio || 1));
+  const h = Math.round(w * H / W);
+
+  if (w === BW && h === BH) return;
+
+  BW = w;
+  BH = h;
+  c_canvas.width = w;
+  c_canvas.height = h;
+  ctx.setTransform(w / W, 0, 0, h / H, 0, 0);
+
+  if (hdrGPU.on) hdrTex();
+
+  draw(state === 'over');
 }
 
 function buildHdrUI() {
@@ -2702,6 +2983,115 @@ function buildHdrUI() {
   $('hdrNote').textContent = t('hdr_note');
   $('rHdr').classList.remove('hide');
 }
+
+function perfUI() {
+  $('tP').innerHTML = perf.on ? t('perf_on') : t('perf_off');
+  $('tP').setAttribute('aria-checked', perf.on);
+}
+
+function setPerf(on) {
+  perf.on = on;
+  document.documentElement.classList.toggle('perf', on);
+
+  try {
+    localStorage.setItem('snake.perf', on ? '1' : '0');
+  } catch (e) {}
+
+  perfUI();
+
+  if (on) hdrOff();
+  else initHDR();
+
+  if (players.length > 0) draw(state === 'over');
+}
+
+$('tP').onclick = () => setPerf(!perf.on);
+perfUI();
+
+const full = { on: false, native: false };
+
+function fullUI() {
+  $('bFs').innerHTML = full.on ? t('btn_fs_off') : t('btn_fs');
+}
+
+function fullPhone() {
+  return matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 600;
+}
+
+function fullLock(on) {
+  const o = screen.orientation;
+  if (!o || !fullPhone()) return;
+
+  try {
+    if (on) o.lock('landscape').catch(() => {});
+    else o.unlock();
+  } catch (e) {}
+}
+
+function fullApply(on) {
+  full.on = on;
+  document.documentElement.classList.toggle('fs', on);
+  fullUI();
+  fullLock(on);
+  window.dispatchEvent(new Event('resize'));
+}
+
+async function fullEnter() {
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen;
+
+  if (req && (document.fullscreenEnabled || document.webkitFullscreenEnabled)) {
+    try {
+      await req.call(el, { navigationUI: 'hide' });
+      full.native = true;
+    } catch (e) {}
+  } else if (window.parent !== window) {
+    window.parent.postMessage({ type: 'snake-fullscreen', on: true }, '*');
+  }
+
+  fullApply(true);
+}
+
+function fullExit() {
+  if (full.native) {
+    full.native = false;
+
+    try {
+      const x = (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      if (x && x.catch) x.catch(() => {});
+    } catch (e) {}
+  } else if (window.parent !== window) {
+    window.parent.postMessage({ type: 'snake-fullscreen', on: false }, '*');
+  }
+
+  fullApply(false);
+}
+
+function fullSync() {
+  if (full.native && !document.fullscreenElement && !document.webkitFullscreenElement) {
+    full.native = false;
+    fullApply(false);
+  }
+}
+
+$('bFs').onclick = () => {
+  if (full.on) fullExit();
+  else fullEnter();
+
+  $('bFs').blur();
+};
+
+document.addEventListener('fullscreenchange', fullSync);
+document.addEventListener('webkitfullscreenchange', fullSync);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && full.on && !full.native) fullExit();
+});
+
+window.addEventListener('message', e => {
+  const d = e.data;
+  if (e.source === window.parent && d && d.type === 'snake-fullscreen-state') fullApply(!!d.on);
+});
 
 $('bDl').onclick = () => Object.assign(document.createElement('a'), { href: 'snake.html', download: 'snake.html' }).click();
 
@@ -2987,6 +3377,8 @@ function syncCfg() {
   setLevel(cfg.level);
   $('tW').innerHTML = cfg.walls ? t('walls_on') : t('walls_off');
   $('tA').innerHTML = cfg.accel ? t('accel_on') : t('accel_off');
+  perfUI();
+  fullUI();
 }
 
 function onCtl(e) {
@@ -3329,6 +3721,12 @@ set('idle');
 reset();
 setMute(mute);
 updateInpUI();
+
+c_canvas.style.aspectRatio = W + ' / ' + H;
+fitCanvas();
+new ResizeObserver(fitCanvas).observe(c_canvas);
+window.addEventListener('resize', fitCanvas);
+
 initHDR();
 
 document.fonts.ready.then(() => draw());
@@ -3345,6 +3743,8 @@ if (window.parent !== window) {
     return h;
   }
   function postSize() {
+    if (root.classList.contains('fs')) return;
+
     const h = naturalHeight();
     if (h === lastH) return;
     lastH = h;
